@@ -9,8 +9,8 @@
 #include <math.h>
 #include <string.h>
 
-int col=0;
-int row=0;
+int col=1;
+int row=1;
 
 %}
 
@@ -126,10 +126,13 @@ if|else {
         col+=1;
 }
 
-[\r\n]+ {
+[\r]+ {
+    printf("Carrier Return\n");
+    col=1;
+}
+[\n]+ {
     printf("Quebra de linha\n");
-        row+=1;
-        col=0;
+    row+=1;
 }
 
 
