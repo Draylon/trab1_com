@@ -23,6 +23,7 @@ DIGITO   [0-9]
 ID       [a-z][a-z0-9]*
 HEX      [a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9]
 
+
 %%
 
 "0x"{HEX} {
@@ -41,23 +42,24 @@ HEX      [a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9]
     col += (int)strlen(yytext);
 }
 
-int|float|double|char {
+void|int|float|double|char {
     printf( "Tipo primitivo: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += (int)strlen(yytext);
 }
 
-"#"{ID} {
+"#include" {
+    printf( "Incluindo algo: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    col += (int)strlen(yytext);
+}
+
+"#define" {
     printf( "Definição: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += (int)strlen(yytext);
 }
 
-for|while{
-    printf( "Laço: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
-}
 
-procedure|function {
-    printf( "Indicador de funções: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+for|while {
+    printf( "Laço: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += (int)strlen(yytext);
 }
 
