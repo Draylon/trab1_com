@@ -46,18 +46,23 @@ int|float|double|char {
     col += (int)strlen(yytext);
 }
 
-"#define "{ID} {
+"#"{ID} {
     printf( "Definição: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += (int)strlen(yytext);
 }
 
-"#include <"{ID}">" {
-    printf( "Include: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+for|while{
+    printf( "Laço: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += (int)strlen(yytext);
 }
 
-if|then|begin|end|procedure|function|define|setlocale|for {
-    printf( "Uma palavra-chave: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+procedure|function {
+    printf( "Indicador de funções: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    col += (int)strlen(yytext);
+}
+
+if|else {
+    printf( "Estrutura lógica: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += (int)strlen(yytext);
 }
 
