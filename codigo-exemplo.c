@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
+#include "random_header.h"
+#include "random_file.c"
 #define TAM 10
 
 int main(){
@@ -24,6 +26,7 @@ int main(){
 				numeros[i] = numeros[i + 1];
 				numeros[i + 1] = aux;
 			}
+			
 		}
 	}
 	

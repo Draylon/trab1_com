@@ -9,8 +9,8 @@
 #include <math.h>
 #include <string.h>
 
-int col=1;
-int row=1;
+unsigned int col=1;
+unsigned int row=1;
 
 %}
 
@@ -32,98 +32,101 @@ ARQUIVO  [A-Za-z0-9]*.[A-Za-z0-9]*
 {DIGITO}+ {
     printf( "Um valor inteiro: ,%s, ,%zu, (%d) encontrado em ( %d : %d )\n", yytext,strlen(yytext),
     atoi( yytext ),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 {DIGITO}+"."{DIGITO}* {
     printf( "Um valor real: ,%s, ,%zu, (%g) encontrado em ( %d : %d )\n", yytext,strlen(yytext),
     atof( yytext ),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 long|void|int|float|double|char {
     printf( "Tipo primitivo: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
-
-"\""{TEXTO}
 
 "#include" {
     printf( "Incluindo algo: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 "#define" {
     printf( "Definição: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
-["<"|"\""]{ARQUIVO}[">"|"\""] {
+"<"{ARQUIVO}">" {
     printf( "Algo a ser incluido: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 "\""({TEXTO}|.)*"\"" {
     printf( "Bloco de texto: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 
 
 "("|")" {
     printf( "Parenteses: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 "{"|"}" {
     printf( "Bloco de função: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 "["|"]" {
     printf( "Índice de ponteiro: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 "=="|"!="|"!=="|"<="|">="|"<"|">" {
     printf( "Um sinal lógico: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 "=" {
     printf( "Atribuição: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
+}
+
+";" {
+    printf( "Final de chamada de função: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    col += strlen(yytext);
 }
 
 "+"|"-"|"*"|"/" {
     printf( "Um operador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 
 
 return|printf|setlocale {
     printf( "Palavra reservada: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 for|while {
     printf( "Laço: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 if|else {
     printf( "Estrutura lógica: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 {ID} {
     printf( "Um identificador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
-"{"[^}\n]*"}"     /* Lembre-se... comentários não tem utilidade! */
+
 
 [ \t] {
-        col+=1;
+        col+=4;
 }
 
 [\r]+ {
@@ -135,10 +138,9 @@ if|else {
     row+=1;
 }
 
-
 . {
     printf( "Caracter não reconhecido: %s\n", yytext );
-    col += (int)strlen(yytext);
+    col += strlen(yytext);
 }
 
 %%
