@@ -381,7 +381,7 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    4,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    2,    5,    6,    7,    1,    1,    1,    1,    8,
+        1,    1,    5,    6,    7,    1,    1,    1,    1,    8,
         9,   10,   11,    1,   12,   13,   14,   15,   15,   15,
        15,   15,   15,   15,   15,   15,   15,    1,   16,   17,
        18,   19,    1,    1,   20,   20,   20,   20,   20,   20,
@@ -981,12 +981,13 @@ case 19:
 YY_RULE_SETUP
 #line 128 "principal.lex"
 {
-        col+=4;
+    printf("Tabulação\n");
+    col+=4;
 }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 132 "principal.lex"
+#line 133 "principal.lex"
 {
     printf("Carrier Return\n");
     col=1;
@@ -995,7 +996,7 @@ YY_RULE_SETUP
 case 21:
 /* rule 21 can match eol */
 YY_RULE_SETUP
-#line 136 "principal.lex"
+#line 137 "principal.lex"
 {
     printf("Quebra de linha\n");
     row+=1;
@@ -1003,18 +1004,18 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 141 "principal.lex"
+#line 142 "principal.lex"
 {
-    printf( "Caracter não reconhecido: %s\n", yytext );
+    printf( "Caracter não reconhecido: %s, len: %zu %d\n",yytext,strlen(yytext),(char)yytext );
     col += strlen(yytext);
 }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 146 "principal.lex"
+#line 147 "principal.lex"
 ECHO;
 	YY_BREAK
-#line 1018 "lex.yy.c"
+#line 1019 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2019,7 +2020,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 146 "principal.lex"
+#line 147 "principal.lex"
 
 
 

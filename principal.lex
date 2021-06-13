@@ -125,8 +125,9 @@ if|else {
 
 
 
-[ \t] {
-        col+=4;
+\t {
+    printf("Tabulação\n");
+    col+=4;
 }
 
 [\r]+ {
@@ -139,7 +140,7 @@ if|else {
 }
 
 . {
-    printf( "Caracter não reconhecido: %s\n", yytext );
+    printf( "Caracter não reconhecido: %s, len: %zu %d\n",yytext,strlen(yytext),(char)yytext );
     col += strlen(yytext);
 }
 
