@@ -190,10 +190,11 @@ if|else {
     }
     col=1;
 }
-[\n]+ {
+[\n] {
     if(comment == 0){
         printf("Quebra de linha\n");
     }
+    col=1;
     row+=1;
 }
 
