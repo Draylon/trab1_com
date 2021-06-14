@@ -20,9 +20,9 @@ unsigned int row=1;
 
 
 DIGITO   [0-9]
-ID       [A-Za-z][A-Za-z0-9]*
+ID       [A-Za-z_][_A-Za-z0-9]*
 HEX      [a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9]
-TEXTO    [A-Za-z0-9]*
+TEXTO    [A-Za-z0-9][A-Za-z0-9]*
 ARQUIVO  [A-Za-z0-9]*.[A-Za-z0-9]*
 
 
@@ -41,7 +41,7 @@ ARQUIVO  [A-Za-z0-9]*.[A-Za-z0-9]*
     col += strlen(yytext);
 }
 
-long|void|int|float|double|char {
+void|char|short|int|long|float|double|signed|unsigned {
     printf( "Tipo primitivo: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
 }
@@ -57,12 +57,12 @@ long|void|int|float|double|char {
 }
 
 "<"{ARQUIVO}">" {
-    printf( "Algo a ser incluido: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    printf( "Biblioteca: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
 }
 
 "\""({TEXTO}|.)*"\"" {
-    printf( "Bloco de texto: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    printf( "String: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
 }
 
@@ -86,13 +86,13 @@ long|void|int|float|double|char {
     col += strlen(yytext);
 }
 
-"=" {
+"="|"*="|"/="|"%="|"+="|"-="|"<<="|">>="|"&="|"^="|"|=" {
     printf( "Atribuição: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
 }
 
 ";" {
-    printf( "Final de chamada de função: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    printf( "Separador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
 }
 
@@ -100,7 +100,6 @@ long|void|int|float|double|char {
     printf( "Um operador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
 }
-
 
 
 return|printf|setlocale {
@@ -123,10 +122,11 @@ if|else {
     col += strlen(yytext);
 }
 
-
+" " {
+    col+=1;
+}
 
 \t {
-    printf("Tabulação\n");
     col+=4;
 }
 
