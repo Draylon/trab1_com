@@ -13,6 +13,17 @@ unsigned int col=1;
 unsigned int row=1;
 int comment=0;
 
+struct symbol {
+    char *name;
+    struct ref *reflist;
+};
+
+struct ref {
+    struct ref *next;
+    char *filename;
+    int flags;
+    int lineno;
+};
 
 
 %}
