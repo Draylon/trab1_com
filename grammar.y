@@ -21,19 +21,56 @@ void yyerror(const char* s);
 %token<fval> T_REAL
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT
 %token T_NEWLINE T_QUIT
+%token T_SWITCH T_LEFT_BLOCK T_LEFT_PARENTHESES T_RIGHT_BLOCK T_RIGHT_PARENTHESES
+%token T_ASSIGN T_CONDICIONAL T_ID T_RESERVED T_RETURN T_LOGIC_OPERATOR T_PRIMITIVO
+%token T_SEPARATOR
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
 %type<ival> expr
 %type<fval> mixed_expr
 
-%start calculation
+%start start_
 
 %%
 
-calculation:	/* Aqui temos a representação do epsilon na gramática... */
-	| calculation line
+start_:	/* Aqui temos a representação do epsilon na gramática... */
+	| start_ statement
 	;
+
+statement: condicional
+	| when
+	| declaracao
+	;
+
+when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES switch_block {  };
+
+funcao: T_ID T_LEFT_PARENTHESES T_RIGHT_PARENTHESES function_block;
+
+block: T_RIGHT_BLOCK T_RESERVED T_LEFT_BLOCK;
+
+switch_block: T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK;
+
+switch_statement: ;
+
+function_block: T_RIGHT_BLOCK T_RESERVED T_RETURN T_ID T_LEFT_BLOCK;
+
+condicao: T_ID T_LOGIC_OPERATOR T_ID;
+
+condicional: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES statement;
+
+declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR;
+
+
+
+
+
+
+
+
+
+
+
 
 line: T_NEWLINE
 	| mixed_expr T_NEWLINE					{ printf("\tResultado: %f\n", $1);}
@@ -65,7 +102,9 @@ expr: T_INT									{ $$ = $1; }
 	| T_LEFT expr T_RIGHT					{ $$ = $2; }
 	;
 
+
 %%
+
 
 int main() {
 	yyin = stdin;

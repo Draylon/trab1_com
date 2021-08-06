@@ -1,3 +1,4 @@
 .vscode/
 binary
 lex.yy.c
+*.tab.*

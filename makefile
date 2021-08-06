@@ -1,11 +1,14 @@
 
-all: flex gcc
+all: bison flex gcc
 
 gcc:
-	gcc lex.yy.c -lfl -o binary
+	gcc grammar.tab.c -lfl -o binary
 
 flex:
 	flex principal.lex
+
+bison:
+	bison -d grammar.y
 
 clean:
 	rm -rf *.o
