@@ -23,7 +23,10 @@ void yyerror(const char* s);
 %token T_NEWLINE T_QUIT
 %token T_SWITCH T_LEFT_BLOCK T_LEFT_PARENTHESES T_RIGHT_BLOCK T_RIGHT_PARENTHESES
 %token T_ASSIGN T_CONDICIONAL T_ID T_RESERVED T_RETURN T_LOGIC_OPERATOR T_PRIMITIVO
-%token T_SEPARATOR
+%token T_DEFINE T_SLC T_STRING T_INCLUDE T_LIBRARY T_LEFT_POINTER T_RIGHT_POINTER
+%token T_OP_SUM T_OP_SUB T_OP_MUL T_OP_DIV
+%token T_MLC_START T_MLC_END T_LOOP T_CONT_CONDICIONAL T_EMPTY
+%token T_TAB T_CARRIER T_UNKNOWN T_SEPARATOR
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
@@ -34,49 +37,43 @@ void yyerror(const char* s);
 
 %%
 
-start_:	/* Aqui temos a representação do epsilon na gramática... */
-	| start_ statement
-	;
+start_:	start_2;
+
+start_2: statement T_NEWLINE start_2
+	| ;
 
 statement: condicional
 	| when
 	| declaracao
+	| comentario
 	;
 
-when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES switch_block {  };
 
-funcao: T_ID T_LEFT_PARENTHESES T_RIGHT_PARENTHESES function_block;
 
-block: T_RIGHT_BLOCK T_RESERVED T_LEFT_BLOCK;
+
+
+
+
+when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES switch_block;
 
 switch_block: T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK;
 
 switch_statement: ;
 
-function_block: T_RIGHT_BLOCK T_RESERVED T_RETURN T_ID T_LEFT_BLOCK;
+
 
 condicao: T_ID T_LOGIC_OPERATOR T_ID;
 
 condicional: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES statement;
 
+
 declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR;
 
 
 
+comentario: T_SLC
 
 
-
-
-
-
-
-
-
-line: T_NEWLINE
-	| mixed_expr T_NEWLINE					{ printf("\tResultado: %f\n", $1);}
-	| expr T_NEWLINE							{ printf("\tResultado: %i\n", $1); }
-	| T_QUIT T_NEWLINE						{ printf("Até mais...\n"); exit(0); }
-	;
 
 mixed_expr: T_REAL							{ $$ = $1; }
 	| mixed_expr T_PLUS mixed_expr		{ $$ = $1 + $3; }
@@ -105,6 +102,21 @@ expr: T_INT									{ $$ = $1; }
 
 %%
 
+/*
+
+funcao: T_ID T_LEFT_PARENTHESES T_RIGHT_PARENTHESES function_block;
+
+block: T_RIGHT_BLOCK T_RESERVED T_LEFT_BLOCK;
+
+function_block: T_RIGHT_BLOCK T_RESERVED T_RETURN T_ID T_LEFT_BLOCK;
+
+line: T_NEWLINE
+	| mixed_expr T_NEWLINE					{ printf("\tResultado: %f\n", $1);}
+	| expr T_NEWLINE							{ printf("\tResultado: %i\n", $1); }
+	| T_QUIT T_NEWLINE						{ printf("Até mais...\n"); exit(0); }
+	;
+
+*/
 
 int main() {
 	yyin = stdin;

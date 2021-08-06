@@ -2,7 +2,7 @@
 all: bison flex gcc
 
 gcc:
-	gcc grammar.tab.c -lfl -o binary
+	gcc grammar.tab.c lex.yy.c -lm -lfl -o binary
 
 flex:
 	flex principal.lex
@@ -19,4 +19,4 @@ run: clean all
 	./binary codigo-exemplo.c
 
 run: clean all
-	./binary codigo-exemplo.c
+	./binary testes/arquivo.txt

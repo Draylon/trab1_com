@@ -8,22 +8,14 @@
 /* Para as funções atoi() e atof() */
 #include <math.h>
 #include <string.h>
+#include "grammar.tab.h"
+
+#define YY_DECL int yylex()
+
 
 unsigned int col=1;
 unsigned int row=1;
 int comment=0;
-
-struct symbol {
-    char *name;
-    struct ref *reflist;
-};
-
-struct ref {
-    struct ref *next;
-    char *filename;
-    int flags;
-    int lineno;
-};
 
 
 %}
@@ -169,37 +161,40 @@ void|char|short|int|long|float|double|signed|unsigned {
 }
 
 "="|"*="|"/="|"%="|"+="|"-="|"<<="|">>="|"&="|"^="|"|=" {
+    col += strlen(yytext);
     if(comment == 0){
         printf( "Atribuição: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+        return T_ASSIGN;
     }
-    col += strlen(yytext);
-    return T_ASSIGN;
 }
 
 ";" {
+    col += strlen(yytext);
     if(comment == 0){
         printf( "Separador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+        return T_SEPARATOR;
     }
-    col += strlen(yytext);
-    return T_SEPARATOR;
+    return T_STRING;
 }
 
 
 
 "+" {
+    col += strlen(yytext);
     if(comment == 0){
         printf( "Somaa: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+        return T_OP_SUM;
     }
-    col += strlen(yytext);
-    return T_OP_SUM;
+    return T_STRING;
 }
 
 "-" {
+    col += strlen(yytext);
     if(comment == 0){
         printf( "Um operador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+        return T_OP_SUB;
     }
-    col += strlen(yytext);
-    return T_OP_SUB;
+    return T_STRING;
 }
 
 "*" {
@@ -286,6 +281,7 @@ if {
         printf( "Estrutura lógica: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
         return T_CONDICIONAL;
     }
+    return T_STRING;
 }
 
 else {
@@ -294,6 +290,7 @@ else {
         printf( "Estrutura lógica: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
         return T_CONT_CONDICIONAL;
     }
+    return T_STRING;
 }
 
 
@@ -305,7 +302,9 @@ else {
     col += strlen(yytext);
     if(comment == 0){
         printf( "Um identificador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+        return T_ID;
     }
+    return T_STRING;
 }
 
 " " {
@@ -315,6 +314,7 @@ else {
 
 \t {
     col+=4;
+    return T_TAB;
 }
 
 [\r]+ {
@@ -337,13 +337,13 @@ else {
         printf( "Caracter não reconhecido: %s, len: %zu encontrado em ( %d : %d )\n",yytext,strlen(yytext),row,col );
     }
     col += strlen(yytext);
-    return 
+    return T_UNKNOWN;
 }
 
 %%
 
 
-
+/*
 int main( argc, argv )
 int argc;
 char **argv;
@@ -358,3 +358,4 @@ char **argv;
     
 	return 0;
 }
+*/
