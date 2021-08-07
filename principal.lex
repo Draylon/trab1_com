@@ -17,6 +17,12 @@ unsigned int col=1;
 unsigned int row=1;
 int comment=0;
 
+void check_comment(int s){
+    if(comment == 1){
+        col+=s;
+    }
+    return T_STRING;
+}
 
 %}
 
@@ -36,52 +42,53 @@ ARQUIVO  [a-zA-Z0-9\/.-]+
 %%
 
 {DIGITO}+ {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Um valor inteiro: ,%s, ,%zu, (%d) encontrado em ( %d : %d )\n", yytext,strlen(yytext),atoi( yytext ),row,col );
-        return T_INT;
+    col += strlen(yytext);
+    return T_INT;
     
     
 }
 
 {DIGITO}+"."{DIGITO}* {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Um valor real: ,%s, ,%zu, (%g) encontrado em ( %d : %d )\n", yytext,strlen(yytext),atof( yytext ),row,col );
-        return T_REAL;
+    col += strlen(yytext);
+    return T_REAL;
     
 }
 
 void|char|short|int|long|float|double|signed|unsigned {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Tipo primitivo: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_PRIMITIVO;
+    col += strlen(yytext);
+    return T_PRIMITIVO;
 }
 
 "#include" {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Incluindo algo: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_INCLUDE;
+    col += strlen(yytext);
+    return T_INCLUDE;
     
 }
 
 "#define" {
-    
+    check_comment(strlen(yytext));
     printf( "Definição: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
     return T_DEFINE;
 }
 
 "<"{ARQUIVO}">" {
-    
+    check_comment(strlen(yytext));
     printf( "Biblioteca: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
     return T_LIBRARY;
 }
 
 "\""({TEXTO}|.)*"\"" {
+    check_comment(strlen(yytext));
     printf( "String: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
     return T_STRING;
@@ -90,110 +97,109 @@ void|char|short|int|long|float|double|signed|unsigned {
 
 
 "(" {
+    check_comment(strlen(yytext));
     printf( "Abre parenteses: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
     return T_LEFT_PARENTHESES;
-    
 }
 
 ")" {
-    col += strlen(yytext);
+    check_comment(strlen(yytext));
     printf( "Abre parenteses: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    col += strlen(yytext);
     return T_RIGHT_PARENTHESES;
     
 }
 
 "{" {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Abre bloco de função: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_LEFT_BLOCK;
-    
+    col += strlen(yytext);
+    return T_LEFT_BLOCK;
 }
 
 "}" {
-    col += strlen(yytext);
+    check_comment(strlen(yytext));
     printf( "Fecha bloco de função: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    col += strlen(yytext);
     return T_RIGHT_BLOCK;
     
 }
 
 "[" {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Abre colchete: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_LEFT_POINTER;
+    col += strlen(yytext);
+    return T_LEFT_POINTER;
     
 }
 
 "]" {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Fecha colchete: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_RIGHT_POINTER;
+    col += strlen(yytext);
+    return T_RIGHT_POINTER;
     
 }
 
 "=="|"!="|"!=="|"<="|">="|"<"|">" {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Um sinal lógico: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_LOGIC_OPERATOR;
+    col += strlen(yytext);
+    return T_LOGIC_OPERATOR;
     
 }
 
 "="|"*="|"/="|"%="|"+="|"-="|"<<="|">>="|"&="|"^="|"|=" {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Atribuição: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_ASSIGN;
+    col += strlen(yytext);
+    return T_ASSIGN;
 }
 
 ";" {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Separador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_SEPARATOR;
-    
+    col += strlen(yytext);
+    return T_SEPARATOR;
 }
 
 
 
 "+" {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Somaa: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_OP_SUM;
+    col += strlen(yytext);
+    return T_OP_SUM;
     
 }
 
 "-" {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Um operador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_OP_SUB;
-    
+    col += strlen(yytext);
+    return T_OP_SUB;
 }
 
 "*" {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Um operador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_OP_MUL;
+    col += strlen(yytext);
+    return T_OP_MUL;
     
 }
 
 "+"|"-"|"*"|"/" {
-    col += strlen(yytext);
-    
+    check_comment(strlen(yytext));
     printf( "Um operador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_OP_DIV;
-    
+    col += strlen(yytext);
+    return T_OP_DIV;
 }
 
 
 "//"(.)* {
-printf( "Comentario de uma linha: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    check_comment(strlen(yytext));
+    printf( "Comentario de uma linha: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
     return T_SLC;
 }

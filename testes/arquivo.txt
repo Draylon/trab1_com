@@ -1,5 +1,11 @@
 // https://kotlinlang.org/docs/control-flow.html#when-expression
 
+/*
+    comentário de multiplas
+    linhas
+
+*/
+
 int x = 2;
 
 if(1 == 1){
