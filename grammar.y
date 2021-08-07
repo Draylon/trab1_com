@@ -40,6 +40,7 @@ void yyerror(const char* s);
 start_:	start_2;
 
 start_2: statement T_NEWLINE start_2
+	| T_NEWLINE start_2
 	| ;
 
 statement: condicional
@@ -64,14 +65,16 @@ switch_statement: ;
 
 condicao: T_ID T_LOGIC_OPERATOR T_ID;
 
-condicional: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES statement;
+condicional: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES statement { printf("Sintático condicional\n");};
 
 
-declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR;
+declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR { printf("Sintático atribuição\n");};
 
 
 
-comentario: T_SLC
+comentario: T_SLC T_NEWLINE
+	| T_MLC_START;
+
 
 
 
@@ -90,6 +93,7 @@ mixed_expr: T_REAL							{ $$ = $1; }
 	| mixed_expr T_MULTIPLY expr			{ $$ = $1 * $3; }
 	| mixed_expr T_DIVIDE expr				{ $$ = $1 / $3; }
 	| expr T_DIVIDE expr						{ $$ = $1 / (float)$3; }
+	| expr
 	;
 
 expr: T_INT									{ $$ = $1; }
@@ -118,7 +122,14 @@ line: T_NEWLINE
 
 */
 
-int main() {
+int main( argc, argv )
+int argc;
+char **argv;
+{
+	++argv, --argc;
+	if ( argc > 0 )
+		yyin = fopen( argv[0], "r" );
+	else
 	yyin = stdin;
 
 	do {

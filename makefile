@@ -19,4 +19,4 @@ run: clean all
 	./binary codigo-exemplo.c
 
 run: clean all
-	./binary testes/arquivo.txt
+	./binary arquivo.txt
