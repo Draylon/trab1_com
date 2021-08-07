@@ -1,22 +1,17 @@
+file_name = if
+bison_file = grammar.y
+lex_file = principal.lex
 
-all: bison flex gcc
+all: bison flex gcc 
 
-gcc:
-	gcc grammar.tab.c -lfl -o binary
+bison: 
+	bison -d -Wcounterexamples $(bison_file) 
 
-flex:
-	flex principal.lex
+flex: 
+	flex $(lex_file)
 
-bison:
-	bison -d grammar.y
+gcc: 
+	gcc grammar.tab.c lex.yy.c -o $(file_name) -lm
 
-clean:
-	rm -rf *.o
-	rm -rf *.exe
-	rm -rf binary
-
-run: clean all
-	./binary codigo-exemplo.c
-
-run: clean all
-	./binary codigo-exemplo.c
+clean: 
+	rm -f $(file_name)  *.c *.h 
