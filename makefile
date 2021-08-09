@@ -8,7 +8,7 @@ flex:
 	flex principal.lex
 
 bison:
-	bison -d grammar.y
+	bison -d -v grammar.y
 
 clean:
 	rm -rf *.o
