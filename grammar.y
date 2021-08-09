@@ -66,7 +66,7 @@ function_statements: statement function_statements | ;
 
 
 
-chamada_funcao: T_ID T_RESERVED T_LEFT_PARENTHESES funcao_args T_RIGHT_PARENTHESES T_SEPARATOR {printf("Sintático chamada de funcao\n");};
+chamada_funcao: T_ID T_RESERVED T_LEFT_PARENTHESES funcao_args T_RIGHT_PARENTHESES T_SEPARATOR {printf("\033[0;34mSintático chamada de funcao\033[0m\n");};
 funcao_args: | T_STRING | T_ID ;
 
 
@@ -82,12 +82,12 @@ switch_statement: T_NEWLINE switch_statement
 
 condicao: mixed_expr T_LOGIC_OPERATOR mixed_expr;
 
-condicional: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_block { printf("Sintático condicional\n");};
+condicional: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático condicional\033[0m\n");};
 
-declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR { printf("Sintático atribuição\n");};
+declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR { printf("\033[0;34mSintático atribuição\033[0m\n");};
 
-comentario: T_SLC {printf("Sintatico Comentário unica linha\n");}
-	| T_MLC_START comm_ml T_MLC_END {printf("Sintatico Comentário multi-linhas\n");};
+comentario: T_SLC {printf("\033[0;34mSintatico Comentário unica linha\033[0m\n");}
+	| T_MLC_START comm_ml T_MLC_END {printf("\033[0;34mSintatico Comentário multi-linhas\033[0m\n");};
 
 comm_ml: T_COMMENT_C | T_NEWLINE | comm_ml;
 
