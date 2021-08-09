@@ -11,6 +11,8 @@ bison:
 	bison -d grammar.y
 
 clean:
+	rm lex.yy.c
+	rm grammar.tab.*
 	rm -rf *.o
 	rm -rf *.exe
 	rm -rf binary

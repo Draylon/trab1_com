@@ -17,8 +17,8 @@ void yyerror(const char* s);
 
 /* Declaração dos tokens... */
 
-%token<ival> T_INT
-%token<fval> T_REAL
+%token <ival> T_INT
+%token <fval> T_REAL
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT
 %token T_NEWLINE T_QUIT
 %token T_SWITCH T_LEFT_BLOCK T_LEFT_PARENTHESES T_RIGHT_BLOCK T_RIGHT_PARENTHESES
@@ -33,26 +33,20 @@ void yyerror(const char* s);
 %type<ival> expr
 %type<fval> mixed_expr
 
-%start start_
+%start start
 
 %%
 
-start_:	start_2;
-
-start_2: statement T_NEWLINE start_2
-	| T_NEWLINE start_2
+start: statement start
+	| T_NEWLINE start
 	| ;
 
 statement: condicional
 	| when
 	| declaracao
 	| comentario
+	| sum_pos_fix
 	;
-
-
-
-
-
 
 
 when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES switch_block;
@@ -61,23 +55,20 @@ switch_block: T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK;
 
 switch_statement: ;
 
-
+sum_pos_fix: T_ID T_OP_SUM T_OP_SUM T_SEPARATOR T_NEWLINE { printf("\e[1;34mSintático sum pos fixo\e[0m\n");}
+	| T_ID T_OP_SUM T_OP_SUM T_SEPARATOR { printf("\e[1;34mSintático sum pos fixo\e[0m\n");}
+	;
 
 condicao: T_ID T_LOGIC_OPERATOR T_ID;
 
-condicional: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES statement { printf("Sintático condicional\n");};
+condicional: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES statement { printf("\e[1;34mSintático condicional\e[0m\n");};
 
 
-declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR { printf("Sintático atribuição\n");};
+declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR { printf("\e[1;34mSintático atribuição\e[0m\n");};
 
 
-
-comentario: T_SLC T_NEWLINE {printf("Sintatico Comentário unica linha\n");}
-	| T_MLC_START comm_ml T_MLC_END {printf("Sintatico Comentário multi-linhas\n");};
-
-comm_ml: T_INT comm_ml | T_REAL comm_ml | T_PLUS comm_ml | T_MINUS comm_ml | T_MULTIPLY comm_ml | T_DIVIDE comm_ml | T_LEFT comm_ml | T_RIGHT comm_ml | T_NEWLINE comm_ml | T_QUIT comm_ml | T_SWITCH comm_ml | T_LEFT_BLOCK comm_ml | T_LEFT_PARENTHESES comm_ml | T_RIGHT_BLOCK comm_ml | T_RIGHT_PARENTHESES comm_ml | T_ASSIGN comm_ml | T_CONDICIONAL comm_ml | T_ID comm_ml | T_RESERVED comm_ml | T_RETURN comm_ml | T_LOGIC_OPERATOR comm_ml | T_PRIMITIVO comm_ml | T_DEFINE comm_ml | T_SLC comm_ml | T_STRING comm_ml | T_INCLUDE comm_ml | T_LIBRARY comm_ml | T_LEFT_POINTER comm_ml | T_RIGHT_POINTER comm_ml | T_OP_SUM comm_ml | T_OP_SUB comm_ml | T_OP_MUL comm_ml | T_OP_DIV comm_ml | T_LOOP comm_ml | T_CONT_CONDICIONAL comm_ml | T_EMPTY comm_ml | T_TAB comm_ml | T_CARRIER comm_ml | T_UNKNOWN comm_ml | T_SEPARATOR comm_ml | T_PLUS comm_ml | T_MINUS comm_ml | T_MULTIPLY comm_ml | T_DIVIDE | ;
-
-
+comentario: T_SLC T_NEWLINE {printf("\e[1;34mSintatico Comentário unica linha\e[0m\n");}
+	| T_SLC
 
 
 mixed_expr: T_REAL							{ $$ = $1; }
@@ -104,7 +95,6 @@ expr: T_INT									{ $$ = $1; }
 	| expr T_MULTIPLY expr					{ $$ = $1 * $3; }
 	| T_LEFT expr T_RIGHT					{ $$ = $2; }
 	;
-
 
 %%
 
@@ -142,6 +132,6 @@ char **argv;
 }
 
 void yyerror(const char* s) {
-	fprintf(stderr, "Erro de análise (sintática): %s\n", s);
+	fprintf(stderr, "\e[1;34mErro de análise (sintática): %s\e[0m\n", s);
 	exit(1);
 }
