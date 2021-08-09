@@ -16,7 +16,7 @@ clean:
 	rm -rf binary
 
 run: clean all
-	./binary codigo-exemplo.c
-
-run: clean all
 	./binary arquivo.txt
+
+flex_run: clean flex
+	gcc lex.yy.c -lfl -lm -o binary

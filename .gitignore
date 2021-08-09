@@ -2,3 +2,4 @@
 binary
 lex.yy.c
 *.tab.*
+*.dot

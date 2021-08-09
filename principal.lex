@@ -74,7 +74,6 @@ void|char|short|int|long|float|double|signed|unsigned {
 "#include" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Incluindo algo",yytext);
-    printf( ": ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
     return T_INCLUDE;
     
@@ -211,7 +210,7 @@ void|char|short|int|long|float|double|signed|unsigned {
 }
 
 
-"//"(.)* {
+\/\/(.)* {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Comentario de uma linha",yytext);
     col += strlen(yytext);
@@ -219,18 +218,21 @@ void|char|short|int|long|float|double|signed|unsigned {
 }
 
 "/*" {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     comment=1;
+    parse_print("MLC Start",yytext);
     col += strlen(yytext);
     return T_MLC_START;
 }
 "*/" {
     comment=0;
+    parse_print("MLC End",yytext);
     col += strlen(yytext);
     return T_MLC_END;
 }
 
 
-printf|setlocale {
+print|setlocale {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Palavra reservada",yytext);
     col += strlen(yytext);
@@ -260,7 +262,6 @@ when {
     parse_print("Seletor when",yytext);
     col += strlen(yytext);
     return T_SWITCH;
-    
 }
 
 if {

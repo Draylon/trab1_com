@@ -1,24 +1,26 @@
+int x = 2;
+
 // https://kotlinlang.org/docs/control-flow.html#when-expression
+
+//print("Show");
+
+if(1 == 1){
+    x print("Show");
+}
+
+when (x) {
+    1 -> print("x == 1");
+    2 -> print("x == 2");
+    3 -> {
+        print();
+    }
+    else -> { // Note the block
+        print("x is neither 1 nor 2")
+    }
+}
 
 /*
     comentário de multiplas
     linhas
 
 */
-
-int x = 2;
-
-if(1 == 1){
-    print("Show");
-}
-
-when (x) {
-    1 -> print("x == 1")
-    2 -> print("x == 2")
-    3 -> {
-        print()
-    }
-    else -> { // Note the block
-        print("x is neither 1 nor 2")
-    }
-}
