@@ -28,7 +28,7 @@ void yyerror(const char* s);
 %token T_LEFT_PARENTHESES T_RIGHT_PARENTHESES
 %token T_SWITCH T_LOOP
 %token T_CONDICIONAL T_CONT_CONDICIONAL
-%token T_ASSIGN T_INCREMENT T_RETURN T_LOGIC_OPERATOR
+%token T_ASSIGN T_INCREMENT T_RETURN T_LOGIC_OPERATOR T_ARROW_RIGHT
 %token T_LEFT_POINTER T_RIGHT_POINTER
 %token T_OP_SUM T_OP_SUB T_OP_MUL T_OP_DIV
 %token T_MLC_START T_MLC_END T_EMPTY
@@ -73,11 +73,11 @@ funcao_args: | T_STRING | T_ID ;
 
 when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK;
 
-switch_statement: T_NEWLINE
-	| T_ID "->" function_block
-	| mixed_expr "->" function_block
+switch_statement: T_NEWLINE switch_statement
+	| T_ID T_ARROW_RIGHT function_block
+	| mixed_expr T_ARROW_RIGHT function_block
 	| T_CONT_CONDICIONAL "==" function_block
-	| switch_statement;
+	| ;
 
 
 
@@ -93,6 +93,7 @@ comentario: T_SLC {printf("Sintatico Comentário unica linha\n");}
 comm_ml: T_COMMENT_C | T_NEWLINE | comm_ml;
 
 mixed_expr: T_REAL							{ $$ = $1; }
+	| T_INT								{ $$ = $1;}
 	| mixed_expr T_PLUS mixed_expr		{ $$ = $1 + $3; }
 	| mixed_expr T_MINUS mixed_expr		{ $$ = $1 - $3; }
 	| mixed_expr T_MULTIPLY mixed_expr	{ $$ = $1 * $3; }
@@ -107,10 +108,9 @@ mixed_expr: T_REAL							{ $$ = $1; }
 	| mixed_expr T_MULTIPLY expr			{ $$ = $1 * $3; }
 	| mixed_expr T_DIVIDE expr				{ $$ = $1 / $3; }
 	| expr T_DIVIDE expr						{ $$ = $1 / (float)$3; }
-	| expr									{ $$ = $1;}
 	;
 
-expr: T_INT;
+expr: ;
 
 
 %%

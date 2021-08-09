@@ -177,6 +177,13 @@ void|char|short|int|long|float|double|signed|unsigned {
     return T_SEPARATOR;
 }
 
+"->" {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Ponteiro de seta",yytext);
+    col += strlen(yytext);
+    return T_ARROW_RIGHT;
+}
+
 
 
 "+" {
