@@ -17,11 +17,16 @@ unsigned int col=1;
 unsigned int row=1;
 int comment=0;
 
-void check_comment(int s){
+int check_comment(int s){
     if(comment == 1){
         col+=s;
+        return 1;
     }
-    return T_STRING;
+    return 0;
+}
+
+void parse_print(const char* title,const char* yytext){
+    printf( "%s: ,%s, ,%zu, (%d) encontrado em ( %d : %d )\n",title, yytext,strlen(yytext),atoi( yytext ),row,col );
 }
 
 %}
@@ -42,8 +47,9 @@ ARQUIVO  [a-zA-Z0-9\/.-]+
 %%
 
 {DIGITO}+ {
-    check_comment(strlen(yytext));
-    printf( "Um valor inteiro: ,%s, ,%zu, (%d) encontrado em ( %d : %d )\n", yytext,strlen(yytext),atoi( yytext ),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+
+    parse_print("Um valor inteiro",yytext);
     col += strlen(yytext);
     return T_INT;
     
@@ -51,45 +57,46 @@ ARQUIVO  [a-zA-Z0-9\/.-]+
 }
 
 {DIGITO}+"."{DIGITO}* {
-    check_comment(strlen(yytext));
-    printf( "Um valor real: ,%s, ,%zu, (%g) encontrado em ( %d : %d )\n", yytext,strlen(yytext),atof( yytext ),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Um valor real",yytext);
     col += strlen(yytext);
     return T_REAL;
     
 }
 
 void|char|short|int|long|float|double|signed|unsigned {
-    check_comment(strlen(yytext));
-    printf( "Tipo primitivo: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Tipo primitivo",yytext);
     col += strlen(yytext);
     return T_PRIMITIVO;
 }
 
 "#include" {
-    check_comment(strlen(yytext));
-    printf( "Incluindo algo: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Incluindo algo",yytext);
+    printf( ": ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
     col += strlen(yytext);
     return T_INCLUDE;
     
 }
 
 "#define" {
-    check_comment(strlen(yytext));
-    printf( "Definição: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Definição",yytext);
     col += strlen(yytext);
     return T_DEFINE;
 }
 
 "<"{ARQUIVO}">" {
-    check_comment(strlen(yytext));
-    printf( "Biblioteca: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Biblioteca",yytext);
     col += strlen(yytext);
     return T_LIBRARY;
 }
 
 "\""({TEXTO}|.)*"\"" {
-    check_comment(strlen(yytext));
-    printf( "String: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("String",yytext);
     col += strlen(yytext);
     return T_STRING;
 }
@@ -97,69 +104,76 @@ void|char|short|int|long|float|double|signed|unsigned {
 
 
 "(" {
-    check_comment(strlen(yytext));
-    printf( "Abre parenteses: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Abre parenteses",yytext);
     col += strlen(yytext);
     return T_LEFT_PARENTHESES;
 }
 
 ")" {
-    check_comment(strlen(yytext));
-    printf( "Abre parenteses: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Fecha parenteses",yytext);
     col += strlen(yytext);
     return T_RIGHT_PARENTHESES;
     
 }
 
 "{" {
-    check_comment(strlen(yytext));
-    printf( "Abre bloco de função: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Abre bloco de função",yytext);
     col += strlen(yytext);
     return T_LEFT_BLOCK;
 }
 
 "}" {
-    check_comment(strlen(yytext));
-    printf( "Fecha bloco de função: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Fecha bloco de função",yytext);
     col += strlen(yytext);
     return T_RIGHT_BLOCK;
     
 }
 
 "[" {
-    check_comment(strlen(yytext));
-    printf( "Abre colchete: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Abre colchete",yytext);
     col += strlen(yytext);
     return T_LEFT_POINTER;
     
 }
 
 "]" {
-    check_comment(strlen(yytext));
-    printf( "Fecha colchete: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Fecha colchete",yytext);
     col += strlen(yytext);
     return T_RIGHT_POINTER;
     
 }
 
 "=="|"!="|"!=="|"<="|">="|"<"|">" {
-    check_comment(strlen(yytext));
-    printf( "Um sinal lógico: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Um sinal lógico",yytext);
     col += strlen(yytext);
     return T_LOGIC_OPERATOR;
     
 }
 
 "="|"*="|"/="|"%="|"+="|"-="|"<<="|">>="|"&="|"^="|"|=" {
-    check_comment(strlen(yytext));
-    printf( "Atribuição: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Atribuição",yytext);
     col += strlen(yytext);
     return T_ASSIGN;
 }
 
+"++"|"--" {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Incremento",yytext);
+    col += strlen(yytext);
+    return T_INCREMENT;
+}
+
 ";" {
-    check_comment(strlen(yytext));
-    printf( "Separador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Separador",yytext);
     col += strlen(yytext);
     return T_SEPARATOR;
 }
@@ -167,39 +181,39 @@ void|char|short|int|long|float|double|signed|unsigned {
 
 
 "+" {
-    check_comment(strlen(yytext));
-    printf( "Somaa: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Soma",yytext);
     col += strlen(yytext);
     return T_OP_SUM;
     
 }
 
 "-" {
-    check_comment(strlen(yytext));
-    printf( "Um operador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Subtracao",yytext);
     col += strlen(yytext);
     return T_OP_SUB;
 }
 
 "*" {
-    check_comment(strlen(yytext));
-    printf( "Um operador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Multiplicacao",yytext);
     col += strlen(yytext);
     return T_OP_MUL;
     
 }
 
 "+"|"-"|"*"|"/" {
-    check_comment(strlen(yytext));
-    printf( "Um operador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Um operador",yytext);
     col += strlen(yytext);
     return T_OP_DIV;
 }
 
 
 "//"(.)* {
-    check_comment(strlen(yytext));
-    printf( "Comentario de uma linha: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Comentario de uma linha",yytext);
     col += strlen(yytext);
     return T_SLC;
 }
@@ -217,52 +231,51 @@ void|char|short|int|long|float|double|signed|unsigned {
 
 
 printf|setlocale {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Palavra reservada",yytext);
     col += strlen(yytext);
-    
-    printf( "Palavra reservada: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_RESERVED;
+    return T_RESERVED;
     
 }
 
 "return" {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Return",yytext);
     col += strlen(yytext);
-    
-    printf( "Return: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_RETURN;
-    
+    return T_RETURN;
 }
 
 
 
 for|while {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Laço",yytext);
     col += strlen(yytext);
-    
-    printf( "Laço: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_LOOP;
+    return T_LOOP;
     
 }
 
 when {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Seletor when",yytext);
     col += strlen(yytext);
-    
-    printf( "Laço: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_SWITCH;
+    return T_SWITCH;
     
 }
 
 if {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Estrutura lógica",yytext);
     col += strlen(yytext);
-    
-    printf( "Estrutura lógica: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_CONDICIONAL;
+    return T_CONDICIONAL;
     
 }
 
 else {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Estrutura lógica",yytext);
     col += strlen(yytext);
-    
-    printf( "Estrutura lógica: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_CONT_CONDICIONAL;
+    return T_CONT_CONDICIONAL;
     
 }
 
@@ -272,10 +285,10 @@ else {
 
 
 {ID} {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Um identificador",yytext);
     col += strlen(yytext);
-    
-    printf( "Um identificador: ,%s, ,%zu, encontrado em ( %d : %d )\n", yytext,strlen(yytext),row,col );
-        return T_ID;
+    return T_ID;
     
 }
 
@@ -300,8 +313,8 @@ else {
 }
 
 . {
-    
-    printf( "Caracter não reconhecido: %s, len: %zu encontrado em ( %d : %d )\n",yytext,strlen(yytext),row,col );
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Caracter não reconhecido",yytext);
     col += strlen(yytext);
     return T_UNKNOWN;
 }

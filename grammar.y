@@ -27,6 +27,8 @@ void yyerror(const char* s);
 %token T_OP_SUM T_OP_SUB T_OP_MUL T_OP_DIV
 %token T_MLC_START T_MLC_END T_LOOP T_CONT_CONDICIONAL T_EMPTY
 %token T_TAB T_CARRIER T_UNKNOWN T_SEPARATOR
+%token T_COMMENT_C
+%token T_INCREMENT
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
 
@@ -70,15 +72,12 @@ condicional: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES state
 
 declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR { printf("Sintático atribuição\n");};
 
-
-
 comentario: T_SLC T_NEWLINE {printf("Sintatico Comentário unica linha\n");}
 	| T_MLC_START comm_ml T_MLC_END {printf("Sintatico Comentário multi-linhas\n");};
 
-comm_ml: T_INT comm_ml | T_REAL comm_ml | T_PLUS comm_ml | T_MINUS comm_ml | T_MULTIPLY comm_ml | T_DIVIDE comm_ml | T_LEFT comm_ml | T_RIGHT comm_ml | T_NEWLINE comm_ml | T_QUIT comm_ml | T_SWITCH comm_ml | T_LEFT_BLOCK comm_ml | T_LEFT_PARENTHESES comm_ml | T_RIGHT_BLOCK comm_ml | T_RIGHT_PARENTHESES comm_ml | T_ASSIGN comm_ml | T_CONDICIONAL comm_ml | T_ID comm_ml | T_RESERVED comm_ml | T_RETURN comm_ml | T_LOGIC_OPERATOR comm_ml | T_PRIMITIVO comm_ml | T_DEFINE comm_ml | T_SLC comm_ml | T_STRING comm_ml | T_INCLUDE comm_ml | T_LIBRARY comm_ml | T_LEFT_POINTER comm_ml | T_RIGHT_POINTER comm_ml | T_OP_SUM comm_ml | T_OP_SUB comm_ml | T_OP_MUL comm_ml | T_OP_DIV comm_ml | T_LOOP comm_ml | T_CONT_CONDICIONAL comm_ml | T_EMPTY comm_ml | T_TAB comm_ml | T_CARRIER comm_ml | T_UNKNOWN comm_ml | T_SEPARATOR comm_ml | T_PLUS comm_ml | T_MINUS comm_ml | T_MULTIPLY comm_ml | T_DIVIDE | ;
-
-
-
+comm_ml: T_COMMENT_C | 
+		 T_NEWLINE | 
+		 comm_ml | ;
 
 mixed_expr: T_REAL							{ $$ = $1; }
 	| mixed_expr T_PLUS mixed_expr		{ $$ = $1 + $3; }
@@ -95,8 +94,20 @@ mixed_expr: T_REAL							{ $$ = $1; }
 	| mixed_expr T_MULTIPLY expr			{ $$ = $1 * $3; }
 	| mixed_expr T_DIVIDE expr				{ $$ = $1 / $3; }
 	| expr T_DIVIDE expr						{ $$ = $1 / (float)$3; }
-	| expr
+	| expr									{ $$ = $1;}
 	;
+
+expr: T_INT;
+
+
+%%
+
+/*
+
+comentario: T_SLC T_NEWLINE {printf("Sintatico Comentário unica linha\n");}
+	| T_MLC_START comm_ml T_MLC_END {printf("Sintatico Comentário multi-linhas\n");};
+
+comm_ml: T_INT comm_ml | T_REAL comm_ml | T_PLUS comm_ml | T_MINUS comm_ml | T_MULTIPLY comm_ml | T_DIVIDE comm_ml | T_LEFT comm_ml | T_RIGHT comm_ml | T_NEWLINE comm_ml | T_QUIT comm_ml | T_SWITCH comm_ml | T_LEFT_BLOCK comm_ml | T_LEFT_PARENTHESES comm_ml | T_RIGHT_BLOCK comm_ml | T_RIGHT_PARENTHESES comm_ml | T_ASSIGN comm_ml | T_CONDICIONAL comm_ml | T_ID comm_ml | T_RESERVED comm_ml | T_RETURN comm_ml | T_LOGIC_OPERATOR comm_ml | T_PRIMITIVO comm_ml | T_DEFINE comm_ml | T_SLC comm_ml | T_STRING comm_ml | T_INCLUDE comm_ml | T_LIBRARY comm_ml | T_LEFT_POINTER comm_ml | T_RIGHT_POINTER comm_ml | T_OP_SUM comm_ml | T_OP_SUB comm_ml | T_OP_MUL comm_ml | T_OP_DIV comm_ml | T_LOOP comm_ml | T_CONT_CONDICIONAL comm_ml | T_EMPTY comm_ml | T_TAB comm_ml | T_CARRIER comm_ml | T_UNKNOWN comm_ml | T_SEPARATOR comm_ml | T_PLUS comm_ml | T_MINUS comm_ml | T_MULTIPLY comm_ml | T_DIVIDE | ;
 
 expr: T_INT									{ $$ = $1; }
 	| expr T_PLUS expr						{ $$ = $1 + $3; }
@@ -104,11 +115,6 @@ expr: T_INT									{ $$ = $1; }
 	| expr T_MULTIPLY expr					{ $$ = $1 * $3; }
 	| T_LEFT expr T_RIGHT					{ $$ = $2; }
 	;
-
-
-%%
-
-/*
 
 funcao: T_ID T_LEFT_PARENTHESES T_RIGHT_PARENTHESES function_block;
 
