@@ -66,16 +66,16 @@ function_statements: statement function_statements | ;
 
 
 
-chamada_funcao: T_ID T_RESERVED T_LEFT_PARENTHESES funcao_args T_RIGHT_PARENTHESES T_SEPARATOR {printf("\033[0;34mSintático chamada de funcao\033[0m\n");};
+chamada_funcao: T_RESERVED T_LEFT_PARENTHESES funcao_args T_RIGHT_PARENTHESES T_SEPARATOR {printf("\033[0;34mSintático chamada de funcao\033[0m\n");};
 funcao_args: | T_STRING | T_ID ;
 
 
-when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK;
+when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK {printf("\033[0;34mSintático When\033[0m\n");};
 
 switch_statement: T_NEWLINE switch_statement
-	| T_ID T_ARROW_RIGHT function_block
-	| mixed_expr T_ARROW_RIGHT function_block
-	| T_CONT_CONDICIONAL "==" function_block
+	| T_ID T_ARROW_RIGHT function_block switch_statement
+	| mixed_expr T_ARROW_RIGHT function_block switch_statement
+	| T_CONT_CONDICIONAL T_ARROW_RIGHT function_block switch_statement
 	| ;
 
 

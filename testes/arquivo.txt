@@ -5,7 +5,7 @@ int x = 2;
 //print("Show");
 
 if(1 == 1){
-    x print("Show");
+    print("Show");
 }
 
 when (x) {
@@ -15,11 +15,14 @@ when (x) {
         print();
     }
     else -> { // Note the block
-        print("x is neither 1 nor 2")
+        print("x is neither 1 nor 2");
     }
 }
 
 /*
+    if(x){
+        
+    }
     comentário de multiplas
     linhas
 
