@@ -26,7 +26,7 @@ void yyerror(const char* s);
 %token T_ID T_SEPARATOR T_EXPR_SEPARATOR;
 %token T_LEFT_BLOCK T_RIGHT_BLOCK 
 %token T_LEFT_PARENTHESES T_RIGHT_PARENTHESES
-%token T_SWITCH T_LOOP
+%token T_SWITCH T_FOR T_WHILE T_DO
 %token T_CONDICIONAL
 %left T_CONT_CONDICIONAL
 %token T_ASSIGN T_INCREMENT T_RETURN T_LOGIC_OPERATOR T_ARROW_RIGHT
@@ -51,14 +51,16 @@ start_2: statement start_2
 	| ;
 
 statement: T_NEWLINE
-	| condicional
+	| logico_if
 	| when
-	| declaracao
+	| declaracao T_SEPARATOR
 	| comentario
 	| condicao
 	| chamada_funcao
-	| incremento
-	| loop
+	| incremento T_SEPARATOR
+	| loop_while
+	| loop_for
+	| loop_do
 	;
 
 
@@ -89,23 +91,42 @@ switch_statement: T_NEWLINE switch_statement
 
 
 
-loop: T_LOOP T_LEFT_PARENTHESES loop_cond T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático LOOP\033[0m\n");};
+loop_while: T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático LOOP\033[0m\n");};
 
-loop_cond: condicao loop_cond | ;
+loop_while_cond: condicao loop_while_cond | ;
 
 
+loop_for: T_FOR T_LEFT_PARENTHESES loop_for_cond T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático LOOP\033[0m\n");};
+
+loop_for_cond: loop_for_dec T_SEPARATOR loop_for_condicao T_SEPARATOR loop_for_inc;
+loop_for_dec: declaracao | ;
+loop_for_condicao: condicao;
+loop_for_inc: incremento | ;
+
+
+loop_do: T_DO function_block T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES T_SEPARATOR;
 
 
 
 condicao: 
-    mixed_expr T_LOGIC_OPERATOR mixed_expr
-  | T_ID T_LOGIC_OPERATOR mixed_expr
-  | mixed_expr T_LOGIC_OPERATOR T_ID
-  | T_ID T_LOGIC_OPERATOR T_ID
-  | T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES;
+    condicao_3 condicao_2;
 
-condicional: cond_2 { printf("\033[0;34mSintático condicional sem else\033[0m\n");}
-	| T_CONT_CONDICIONAL function_block { printf("\033[0;34mSintático condicional com else\033[0m\n");}
+condicao_2: |
+	T_LOGIC_OPERATOR condicao_3 condicao_2 { printf("\033[0;34mSintático condicional and/or \033[0m\n");}
+;
+
+condicao_3: 
+    mixed_expr T_LOGIC_OPERATOR mixed_expr { printf("\033[0;34mSintático condicional 1\033[0m\n");}
+  | T_ID T_LOGIC_OPERATOR mixed_expr { printf("\033[0;34mSintático condicional 2\033[0m\n");}
+  | mixed_expr T_LOGIC_OPERATOR T_ID { printf("\033[0;34mSintático condicional 3\033[0m\n");}
+  | T_ID T_LOGIC_OPERATOR T_ID { printf("\033[0;34mSintático condicional 4\033[0m\n");}
+  | T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES { printf("\033[0;34mSintático condicional 5\033[0m\n");};
+
+
+
+
+logico_if: cond_2 { printf("\033[0;34mSintático logico_if sem else\033[0m\n");}
+	| T_CONT_CONDICIONAL function_block { printf("\033[0;34mSintático logico_if com else\033[0m\n");}
 	;
 
 cond_2: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_block;
@@ -116,14 +137,16 @@ cond_2: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_b
 
 
 declaracao: 
-	  T_CONST T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR { printf("\033[0;34mSintático atribuição com o const\033[0m\n");}
-	| T_CONST T_PRIMITIVO T_ID T_ASSIGN condicao T_SEPARATOR { printf("\033[0;34mSintático atribuição com o const\033[0m\n");}
-	| T_PRIMITIVO T_ID T_ASSIGN condicao T_SEPARATOR { printf("\033[0;34mSintático atribuição\033[0m\n");};
-	| T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR { printf("\033[0;34mSintático atribuição\033[0m\n");};
+	  T_ID T_ASSIGN mixed_expr { printf("\033[0;34mSintático atribuição sem primitivo\033[0m\n");}
+	| T_ID T_ASSIGN condicao { printf("\033[0;34mSintático atribuição sem primitivo\033[0m\n");}
+	| T_CONST T_PRIMITIVO T_ID T_ASSIGN mixed_expr { printf("\033[0;34mSintático atribuição com o const\033[0m\n");}
+	| T_CONST T_PRIMITIVO T_ID T_ASSIGN condicao { printf("\033[0;34mSintático atribuição com o const\033[0m\n");}
+	| T_PRIMITIVO T_ID T_ASSIGN condicao { printf("\033[0;34mSintático atribuição\033[0m\n");}
+	| T_PRIMITIVO T_ID T_ASSIGN mixed_expr { printf("\033[0;34mSintático atribuição\033[0m\n");};
 
 
 
-incremento: T_ID T_INCREMENT T_SEPARATOR {printf("\033[0;34mIncremento\033[0m\n");};
+incremento: T_ID T_INCREMENT {printf("\033[0;34mIncremento\033[0m\n");};
 
 
 
