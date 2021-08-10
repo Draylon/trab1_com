@@ -155,7 +155,7 @@ void|char|short|int|long|float|double|signed|unsigned {
     
 }
 
-"=="|"!="|"!=="|"<="|">="|"<"|">" {
+"=="|"!="|"!=="|"<="|">="|"<"|">"|"and"|"or" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Um sinal lógico",yytext);
     col += strlen(yytext);
@@ -258,7 +258,6 @@ print|setlocale {
     parse_print("Palavra reservada",yytext);
     col += strlen(yytext);
     return T_RESERVED;
-    
 }
 
 "return" {
@@ -268,14 +267,25 @@ print|setlocale {
     return T_RETURN;
 }
 
-
-
-for|while {
+do {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Laço",yytext);
     col += strlen(yytext);
-    return T_LOOP;
-    
+    return T_DO;
+}
+
+while {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Laço",yytext);
+    col += strlen(yytext);
+    return T_WHILE;
+}
+
+for {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Laço",yytext);
+    col += strlen(yytext);
+    return T_FOR;
 }
 
 when {
