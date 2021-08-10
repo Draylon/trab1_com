@@ -321,7 +321,6 @@ else {
     parse_print("Um identificador",yytext);
     col += strlen(yytext);
     return T_ID;
-    
 }
 
 " " {

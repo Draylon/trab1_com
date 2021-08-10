@@ -72,9 +72,12 @@ function_statements: statement function_statements | ;
 
 
 
+
+
 chamada_funcao: funcao_scope T_LEFT_PARENTHESES funcao_args T_RIGHT_PARENTHESES T_SEPARATOR {printf("\033[0;34mSintático chamada de funcao\033[0m\n");};
 funcao_scope: T_RESERVED | T_ID;
 funcao_args: | T_STRING | T_ID ;
+
 
 
 
@@ -91,9 +94,13 @@ switch_statement: T_NEWLINE switch_statement
 
 
 
+
 loop_while: T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático LOOP\033[0m\n");};
 
 loop_while_cond: condicao loop_while_cond | ;
+
+
+
 
 
 loop_for: T_FOR T_LEFT_PARENTHESES loop_for_cond T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático LOOP\033[0m\n");};
@@ -102,6 +109,8 @@ loop_for_cond: loop_for_dec T_SEPARATOR loop_for_condicao T_SEPARATOR loop_for_i
 loop_for_dec: declaracao | ;
 loop_for_condicao: condicao;
 loop_for_inc: incremento | ;
+
+
 
 
 loop_do: T_DO function_block T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES T_SEPARATOR;
@@ -125,11 +134,14 @@ condicao_3:
 
 
 
+
+
 logico_if: cond_2 { printf("\033[0;34mSintático logico_if sem else\033[0m\n");}
 	| T_CONT_CONDICIONAL function_block { printf("\033[0;34mSintático logico_if com else\033[0m\n");}
 	;
 
 cond_2: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_block;
+
 
 
 
