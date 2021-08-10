@@ -25,6 +25,11 @@ while(x < 5){
     print("omegalul");
 }
 
+do{
+    print("show de bola");
+    x++;
+}while(x < 5);
+
 when (x) {
     1 -> print("x == 1");
     2 -> print("x == 2");
