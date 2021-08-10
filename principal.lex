@@ -64,6 +64,13 @@ ARQUIVO  [a-zA-Z0-9\/.-]+
     
 }
 
+const {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Constante",yytext);
+    col += strlen(yytext);
+    return T_CONST;
+}
+
 void|char|short|int|long|float|double|signed|unsigned {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Tipo primitivo",yytext);
@@ -175,6 +182,13 @@ void|char|short|int|long|float|double|signed|unsigned {
     parse_print("Separador",yytext);
     col += strlen(yytext);
     return T_SEPARATOR;
+}
+
+"," {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Separador",yytext);
+    col += strlen(yytext);
+    return T_EXPR_SEPARATOR;
 }
 
 "->" {

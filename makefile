@@ -11,12 +11,17 @@ bison:
 	bison -d -v grammar.y
 
 clean:
+	rm -rf *.c
+	rm -rf *.h
+	rm -rf *.dot
+	rm -rf *.output
+	rm -rf *.tab.*
 	rm -rf *.o
 	rm -rf *.exe
 	rm -rf binary
 
 run: clean all
-	./binary arquivo.txt
+	./binary ./testes/arquivo.txt
 
 flex_run: clean flex
 	gcc lex.yy.c -lfl -lm -o binary

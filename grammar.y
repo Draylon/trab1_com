@@ -22,12 +22,13 @@ void yyerror(const char* s);
 %token T_DEFINE T_INCLUDE T_LIBRARY
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT
 %token T_NEWLINE T_QUIT
-%token T_PRIMITIVO T_RESERVED
-%token T_ID T_SEPARATOR
+%token T_PRIMITIVO T_RESERVED T_CONST
+%token T_ID T_SEPARATOR T_EXPR_SEPARATOR;
 %token T_LEFT_BLOCK T_RIGHT_BLOCK 
 %token T_LEFT_PARENTHESES T_RIGHT_PARENTHESES
 %token T_SWITCH T_LOOP
-%token T_CONDICIONAL T_CONT_CONDICIONAL
+%token T_CONDICIONAL
+%left T_CONT_CONDICIONAL
 %token T_ASSIGN T_INCREMENT T_RETURN T_LOGIC_OPERATOR T_ARROW_RIGHT
 %token T_LEFT_POINTER T_RIGHT_POINTER
 %token T_OP_SUM T_OP_SUB T_OP_MUL T_OP_DIV
@@ -36,6 +37,7 @@ void yyerror(const char* s);
 %token T_COMMENT_C T_SLC
 %left T_PLUS T_MINUS
 %left T_MULTIPLY T_DIVIDE
+
 
 %type<fval> mixed_expr
 
@@ -55,6 +57,8 @@ statement: T_NEWLINE
 	| comentario
 	| condicao
 	| chamada_funcao
+	| incremento
+	| loop
 	;
 
 
@@ -66,8 +70,12 @@ function_statements: statement function_statements | ;
 
 
 
-chamada_funcao: T_RESERVED T_LEFT_PARENTHESES funcao_args T_RIGHT_PARENTHESES T_SEPARATOR {printf("\033[0;34mSintático chamada de funcao\033[0m\n");};
+chamada_funcao: funcao_scope T_LEFT_PARENTHESES funcao_args T_RIGHT_PARENTHESES T_SEPARATOR {printf("\033[0;34mSintático chamada de funcao\033[0m\n");};
+funcao_scope: T_RESERVED | T_ID;
 funcao_args: | T_STRING | T_ID ;
+
+
+
 
 
 when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK {printf("\033[0;34mSintático When\033[0m\n");};
@@ -80,16 +88,51 @@ switch_statement: T_NEWLINE switch_statement
 
 
 
-condicao: mixed_expr T_LOGIC_OPERATOR mixed_expr;
 
-condicional: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático condicional\033[0m\n");};
+loop: T_LOOP T_LEFT_PARENTHESES loop_cond T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático LOOP\033[0m\n");};
 
-declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR { printf("\033[0;34mSintático atribuição\033[0m\n");};
+loop_cond: condicao loop_cond | ;
+
+
+
+
+
+condicao: 
+    mixed_expr T_LOGIC_OPERATOR mixed_expr
+  | T_ID T_LOGIC_OPERATOR mixed_expr
+  | mixed_expr T_LOGIC_OPERATOR T_ID
+  | T_ID T_LOGIC_OPERATOR T_ID
+  | T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES;
+
+condicional: cond_2 { printf("\033[0;34mSintático condicional sem else\033[0m\n");}
+	| T_CONT_CONDICIONAL function_block { printf("\033[0;34mSintático condicional com else\033[0m\n");}
+	;
+
+cond_2: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_block;
+
+
+
+
+
+
+declaracao: 
+	  T_CONST T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR { printf("\033[0;34mSintático atribuição com o const\033[0m\n");}
+	| T_CONST T_PRIMITIVO T_ID T_ASSIGN condicao T_SEPARATOR { printf("\033[0;34mSintático atribuição com o const\033[0m\n");}
+	| T_PRIMITIVO T_ID T_ASSIGN condicao T_SEPARATOR { printf("\033[0;34mSintático atribuição\033[0m\n");};
+	| T_PRIMITIVO T_ID T_ASSIGN mixed_expr T_SEPARATOR { printf("\033[0;34mSintático atribuição\033[0m\n");};
+
+
+
+incremento: T_ID T_INCREMENT T_SEPARATOR {printf("\033[0;34mIncremento\033[0m\n");};
+
+
+
+
 
 comentario: T_SLC {printf("\033[0;34mSintatico Comentário unica linha\033[0m\n");}
 	| T_MLC_START comm_ml T_MLC_END {printf("\033[0;34mSintatico Comentário multi-linhas\033[0m\n");};
 
-comm_ml: T_COMMENT_C | T_NEWLINE | comm_ml;
+comm_ml: T_COMMENT_C comm_ml | T_NEWLINE comm_ml | ;
 
 mixed_expr: T_REAL							{ $$ = $1; }
 	| T_INT								{ $$ = $1;}
@@ -100,7 +143,6 @@ mixed_expr: T_REAL							{ $$ = $1; }
 	| T_LEFT mixed_expr T_RIGHT			{ $$ = $2; }
 	;
 
-expr: ;
 
 
 %%

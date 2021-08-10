@@ -1,11 +1,28 @@
 int x = 2;
-
+const int x = 2;
+x++;
 // https://kotlinlang.org/docs/control-flow.html#when-expression
 
 //print("Show");
 
 if(1 == 1){
     print("Show");
+}
+
+if(1 == 1){
+    print("Show");
+}else{
+    if(show==true) show();
+    print("Show tbm");
+}
+
+if(1 == 1) x++;
+
+while(x < 5){
+    while(x < x){
+        //show
+    }
+    print("omegalul");
 }
 
 when (x) {
