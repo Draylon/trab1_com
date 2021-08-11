@@ -1,0 +1,2020 @@
+Terminals unused in grammar
+
+    T_DEFINE
+    T_INCLUDE
+    T_LIBRARY
+    T_QUIT
+    T_EXPR_SEPARATOR
+    T_RETURN
+    T_LEFT_POINTER
+    T_RIGHT_POINTER
+    T_OP_SUM
+    T_OP_SUB
+    T_OP_MUL
+    T_OP_DIV
+    T_EMPTY
+    T_TAB
+    T_CARRIER
+    T_UNKNOWN
+
+
+Grammar
+
+    0 $accept: start_ $end
+
+    1 start_: start_2
+
+    2 start_2: statement start_2
+    3        | %empty
+
+    4 statement: T_NEWLINE
+    5          | logico_if
+    6          | when
+    7          | declaracao T_SEPARATOR
+    8          | comentario
+    9          | condicao
+   10          | chamada_funcao
+   11          | incremento T_SEPARATOR
+   12          | loop_while
+   13          | loop_for
+   14          | loop_do
+
+   15 function_block: T_LEFT_BLOCK function_statements T_RIGHT_BLOCK
+   16               | statement
+
+   17 function_statements: statement function_statements
+   18                    | %empty
+
+   19 chamada_funcao: funcao_scope T_LEFT_PARENTHESES funcao_args T_RIGHT_PARENTHESES T_SEPARATOR
+
+   20 funcao_scope: T_RESERVED
+   21             | T_ID
+
+   22 funcao_args: %empty
+   23            | T_STRING
+   24            | T_ID
+
+   25 when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK
+
+   26 switch_statement: T_NEWLINE switch_statement
+   27                 | T_ID T_ARROW_RIGHT function_block switch_statement
+   28                 | mixed_expr T_ARROW_RIGHT function_block switch_statement
+   29                 | T_CONT_CONDICIONAL T_ARROW_RIGHT function_block switch_statement
+   30                 | %empty
+
+   31 loop_while: T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES function_block
+
+   32 loop_while_cond: condicao loop_while_cond
+   33                | %empty
+
+   34 loop_for: T_FOR T_LEFT_PARENTHESES loop_for_cond T_RIGHT_PARENTHESES function_block
+
+   35 loop_for_cond: loop_for_dec T_SEPARATOR loop_for_condicao T_SEPARATOR loop_for_inc
+
+   36 loop_for_dec: declaracao
+   37             | %empty
+
+   38 loop_for_condicao: condicao
+
+   39 loop_for_inc: incremento
+   40             | %empty
+
+   41 loop_do: T_DO function_block T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES T_SEPARATOR
+
+   42 condicao: condicao_3 condicao_2
+
+   43 condicao_2: %empty
+   44           | T_LOGIC_OPERATOR condicao_3 condicao_2
+
+   45 condicao_3: mixed_expr T_LOGIC_OPERATOR mixed_expr
+   46           | T_ID T_LOGIC_OPERATOR mixed_expr
+   47           | mixed_expr T_LOGIC_OPERATOR T_ID
+   48           | T_ID T_LOGIC_OPERATOR T_ID
+   49           | T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES
+
+   50 logico_if: cond_2
+   51          | T_CONT_CONDICIONAL function_block
+
+   52 cond_2: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_block
+
+   53 declaracao: T_ID T_ASSIGN mixed_expr
+   54           | T_ID T_ASSIGN condicao
+   55           | T_CONST T_PRIMITIVO T_ID T_ASSIGN mixed_expr
+   56           | T_CONST T_PRIMITIVO T_ID T_ASSIGN condicao
+   57           | T_PRIMITIVO T_ID T_ASSIGN condicao
+   58           | T_PRIMITIVO T_ID T_ASSIGN mixed_expr
+
+   59 incremento: T_ID T_INCREMENT
+
+   60 comentario: T_SLC
+   61           | T_MLC_START comm_ml T_MLC_END
+
+   62 comm_ml: T_COMMENT_C comm_ml
+   63        | T_NEWLINE comm_ml
+   64        | %empty
+
+   65 mixed_expr: T_REAL
+   66           | T_INT
+   67           | mixed_expr T_PLUS mixed_expr
+   68           | mixed_expr T_MINUS mixed_expr
+   69           | mixed_expr T_MULTIPLY mixed_expr
+   70           | mixed_expr T_DIVIDE mixed_expr
+   71           | T_LEFT mixed_expr T_RIGHT
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    T_INT <ival> (258) 66
+    T_REAL <fval> (259) 65
+    T_DEFINE (260)
+    T_INCLUDE (261)
+    T_LIBRARY (262)
+    T_PLUS (263) 67
+    T_MINUS (264) 68
+    T_MULTIPLY (265) 69
+    T_DIVIDE (266) 70
+    T_LEFT (267) 71
+    T_RIGHT (268) 71
+    T_NEWLINE (269) 4 26 63
+    T_QUIT (270)
+    T_PRIMITIVO (271) 55 56 57 58
+    T_RESERVED (272) 20
+    T_CONST (273) 55 56
+    T_ID (274) 21 24 25 27 46 47 48 53 54 55 56 57 58 59
+    T_SEPARATOR (275) 7 11 19 35 41
+    T_EXPR_SEPARATOR (276)
+    T_LEFT_BLOCK (277) 15 25
+    T_RIGHT_BLOCK (278) 15 25
+    T_LEFT_PARENTHESES (279) 19 25 31 34 41 49 52
+    T_RIGHT_PARENTHESES (280) 19 25 31 34 41 49 52
+    T_SWITCH (281) 25
+    T_FOR (282) 34
+    T_WHILE (283) 31 41
+    T_DO (284) 41
+    T_CONDICIONAL (285) 52
+    T_CONT_CONDICIONAL (286) 29 51
+    T_ASSIGN (287) 53 54 55 56 57 58
+    T_INCREMENT (288) 59
+    T_RETURN (289)
+    T_LOGIC_OPERATOR (290) 44 45 46 47 48
+    T_ARROW_RIGHT (291) 27 28 29
+    T_LEFT_POINTER (292)
+    T_RIGHT_POINTER (293)
+    T_OP_SUM (294)
+    T_OP_SUB (295)
+    T_OP_MUL (296)
+    T_OP_DIV (297)
+    T_MLC_START (298) 61
+    T_MLC_END (299) 61
+    T_EMPTY (300)
+    T_STRING (301) 23
+    T_TAB (302)
+    T_CARRIER (303)
+    T_UNKNOWN (304)
+    T_COMMENT_C (305) 62
+    T_SLC (306) 60
+
+
+Nonterminals, with rules where they appear
+
+    $accept (52)
+        on left: 0
+    start_ (53)
+        on left: 1
+        on right: 0
+    start_2 (54)
+        on left: 2 3
+        on right: 1 2
+    statement (55)
+        on left: 4 5 6 7 8 9 10 11 12 13 14
+        on right: 2 16 17
+    function_block (56)
+        on left: 15 16
+        on right: 27 28 29 31 34 41 51 52
+    function_statements (57)
+        on left: 17 18
+        on right: 15 17
+    chamada_funcao (58)
+        on left: 19
+        on right: 10
+    funcao_scope (59)
+        on left: 20 21
+        on right: 19
+    funcao_args (60)
+        on left: 22 23 24
+        on right: 19
+    when (61)
+        on left: 25
+        on right: 6
+    switch_statement (62)
+        on left: 26 27 28 29 30
+        on right: 25 26 27 28 29
+    loop_while (63)
+        on left: 31
+        on right: 12
+    loop_while_cond (64)
+        on left: 32 33
+        on right: 31 32 41
+    loop_for (65)
+        on left: 34
+        on right: 13
+    loop_for_cond (66)
+        on left: 35
+        on right: 34
+    loop_for_dec (67)
+        on left: 36 37
+        on right: 35
+    loop_for_condicao (68)
+        on left: 38
+        on right: 35
+    loop_for_inc (69)
+        on left: 39 40
+        on right: 35
+    loop_do (70)
+        on left: 41
+        on right: 14
+    condicao (71)
+        on left: 42
+        on right: 9 32 38 49 52 54 56 57
+    condicao_2 (72)
+        on left: 43 44
+        on right: 42 44
+    condicao_3 (73)
+        on left: 45 46 47 48 49
+        on right: 42 44
+    logico_if (74)
+        on left: 50 51
+        on right: 5
+    cond_2 (75)
+        on left: 52
+        on right: 50
+    declaracao (76)
+        on left: 53 54 55 56 57 58
+        on right: 7 36
+    incremento (77)
+        on left: 59
+        on right: 11 39
+    comentario (78)
+        on left: 60 61
+        on right: 8
+    comm_ml (79)
+        on left: 62 63 64
+        on right: 61 62 63
+    mixed_expr <fval> (80)
+        on left: 65 66 67 68 69 70 71
+        on right: 28 45 46 47 53 55 58 67 68 69 70 71
+
+
+State 0
+
+    0 $accept: • start_ $end
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    $default  reduce using rule 3 (start_2)
+
+    start_          go to state 18
+    start_2         go to state 19
+    statement       go to state 20
+    chamada_funcao  go to state 21
+    funcao_scope    go to state 22
+    when            go to state 23
+    loop_while      go to state 24
+    loop_for        go to state 25
+    loop_do         go to state 26
+    condicao        go to state 27
+    condicao_3      go to state 28
+    logico_if       go to state 29
+    cond_2          go to state 30
+    declaracao      go to state 31
+    incremento      go to state 32
+    comentario      go to state 33
+    mixed_expr      go to state 34
+
+
+State 1
+
+   66 mixed_expr: T_INT •
+
+    $default  reduce using rule 66 (mixed_expr)
+
+
+State 2
+
+   65 mixed_expr: T_REAL •
+
+    $default  reduce using rule 65 (mixed_expr)
+
+
+State 3
+
+   71 mixed_expr: T_LEFT • mixed_expr T_RIGHT
+
+    T_INT   shift, and go to state 1
+    T_REAL  shift, and go to state 2
+    T_LEFT  shift, and go to state 3
+
+    mixed_expr  go to state 35
+
+
+State 4
+
+    4 statement: T_NEWLINE •
+
+    $default  reduce using rule 4 (statement)
+
+
+State 5
+
+   57 declaracao: T_PRIMITIVO • T_ID T_ASSIGN condicao
+   58           | T_PRIMITIVO • T_ID T_ASSIGN mixed_expr
+
+    T_ID  shift, and go to state 36
+
+
+State 6
+
+   20 funcao_scope: T_RESERVED •
+
+    $default  reduce using rule 20 (funcao_scope)
+
+
+State 7
+
+   55 declaracao: T_CONST • T_PRIMITIVO T_ID T_ASSIGN mixed_expr
+   56           | T_CONST • T_PRIMITIVO T_ID T_ASSIGN condicao
+
+    T_PRIMITIVO  shift, and go to state 37
+
+
+State 8
+
+   21 funcao_scope: T_ID •
+   46 condicao_3: T_ID • T_LOGIC_OPERATOR mixed_expr
+   48           | T_ID • T_LOGIC_OPERATOR T_ID
+   53 declaracao: T_ID • T_ASSIGN mixed_expr
+   54           | T_ID • T_ASSIGN condicao
+   59 incremento: T_ID • T_INCREMENT
+
+    T_ASSIGN          shift, and go to state 38
+    T_INCREMENT       shift, and go to state 39
+    T_LOGIC_OPERATOR  shift, and go to state 40
+
+    $default  reduce using rule 21 (funcao_scope)
+
+
+State 9
+
+   49 condicao_3: T_LEFT_PARENTHESES • condicao T_RIGHT_PARENTHESES
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_ID                shift, and go to state 41
+    T_LEFT_PARENTHESES  shift, and go to state 9
+
+    condicao    go to state 42
+    condicao_3  go to state 28
+    mixed_expr  go to state 34
+
+
+State 10
+
+   25 when: T_SWITCH • T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK
+
+    T_LEFT_PARENTHESES  shift, and go to state 43
+
+
+State 11
+
+   34 loop_for: T_FOR • T_LEFT_PARENTHESES loop_for_cond T_RIGHT_PARENTHESES function_block
+
+    T_LEFT_PARENTHESES  shift, and go to state 44
+
+
+State 12
+
+   31 loop_while: T_WHILE • T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES function_block
+
+    T_LEFT_PARENTHESES  shift, and go to state 45
+
+
+State 13
+
+   41 loop_do: T_DO • function_block T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES T_SEPARATOR
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_BLOCK        shift, and go to state 46
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    statement       go to state 47
+    function_block  go to state 48
+    chamada_funcao  go to state 21
+    funcao_scope    go to state 22
+    when            go to state 23
+    loop_while      go to state 24
+    loop_for        go to state 25
+    loop_do         go to state 26
+    condicao        go to state 27
+    condicao_3      go to state 28
+    logico_if       go to state 29
+    cond_2          go to state 30
+    declaracao      go to state 31
+    incremento      go to state 32
+    comentario      go to state 33
+    mixed_expr      go to state 34
+
+
+State 14
+
+   52 cond_2: T_CONDICIONAL • T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_block
+
+    T_LEFT_PARENTHESES  shift, and go to state 49
+
+
+State 15
+
+   51 logico_if: T_CONT_CONDICIONAL • function_block
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_BLOCK        shift, and go to state 46
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    statement       go to state 47
+    function_block  go to state 50
+    chamada_funcao  go to state 21
+    funcao_scope    go to state 22
+    when            go to state 23
+    loop_while      go to state 24
+    loop_for        go to state 25
+    loop_do         go to state 26
+    condicao        go to state 27
+    condicao_3      go to state 28
+    logico_if       go to state 29
+    cond_2          go to state 30
+    declaracao      go to state 31
+    incremento      go to state 32
+    comentario      go to state 33
+    mixed_expr      go to state 34
+
+
+State 16
+
+   61 comentario: T_MLC_START • comm_ml T_MLC_END
+
+    T_NEWLINE    shift, and go to state 51
+    T_COMMENT_C  shift, and go to state 52
+
+    $default  reduce using rule 64 (comm_ml)
+
+    comm_ml  go to state 53
+
+
+State 17
+
+   60 comentario: T_SLC •
+
+    $default  reduce using rule 60 (comentario)
+
+
+State 18
+
+    0 $accept: start_ • $end
+
+    $end  shift, and go to state 54
+
+
+State 19
+
+    1 start_: start_2 •
+
+    $default  reduce using rule 1 (start_)
+
+
+State 20
+
+    2 start_2: statement • start_2
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    $default  reduce using rule 3 (start_2)
+
+    start_2         go to state 55
+    statement       go to state 20
+    chamada_funcao  go to state 21
+    funcao_scope    go to state 22
+    when            go to state 23
+    loop_while      go to state 24
+    loop_for        go to state 25
+    loop_do         go to state 26
+    condicao        go to state 27
+    condicao_3      go to state 28
+    logico_if       go to state 29
+    cond_2          go to state 30
+    declaracao      go to state 31
+    incremento      go to state 32
+    comentario      go to state 33
+    mixed_expr      go to state 34
+
+
+State 21
+
+   10 statement: chamada_funcao •
+
+    $default  reduce using rule 10 (statement)
+
+
+State 22
+
+   19 chamada_funcao: funcao_scope • T_LEFT_PARENTHESES funcao_args T_RIGHT_PARENTHESES T_SEPARATOR
+
+    T_LEFT_PARENTHESES  shift, and go to state 56
+
+
+State 23
+
+    6 statement: when •
+
+    $default  reduce using rule 6 (statement)
+
+
+State 24
+
+   12 statement: loop_while •
+
+    $default  reduce using rule 12 (statement)
+
+
+State 25
+
+   13 statement: loop_for •
+
+    $default  reduce using rule 13 (statement)
+
+
+State 26
+
+   14 statement: loop_do •
+
+    $default  reduce using rule 14 (statement)
+
+
+State 27
+
+    9 statement: condicao •
+
+    $default  reduce using rule 9 (statement)
+
+
+State 28
+
+   42 condicao: condicao_3 • condicao_2
+
+    T_LOGIC_OPERATOR  shift, and go to state 57
+
+    $default  reduce using rule 43 (condicao_2)
+
+    condicao_2  go to state 58
+
+
+State 29
+
+    5 statement: logico_if •
+
+    $default  reduce using rule 5 (statement)
+
+
+State 30
+
+   50 logico_if: cond_2 •
+
+    $default  reduce using rule 50 (logico_if)
+
+
+State 31
+
+    7 statement: declaracao • T_SEPARATOR
+
+    T_SEPARATOR  shift, and go to state 59
+
+
+State 32
+
+   11 statement: incremento • T_SEPARATOR
+
+    T_SEPARATOR  shift, and go to state 60
+
+
+State 33
+
+    8 statement: comentario •
+
+    $default  reduce using rule 8 (statement)
+
+
+State 34
+
+   45 condicao_3: mixed_expr • T_LOGIC_OPERATOR mixed_expr
+   47           | mixed_expr • T_LOGIC_OPERATOR T_ID
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   68           | mixed_expr • T_MINUS mixed_expr
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   70           | mixed_expr • T_DIVIDE mixed_expr
+
+    T_PLUS            shift, and go to state 61
+    T_MINUS           shift, and go to state 62
+    T_MULTIPLY        shift, and go to state 63
+    T_DIVIDE          shift, and go to state 64
+    T_LOGIC_OPERATOR  shift, and go to state 65
+
+
+State 35
+
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   68           | mixed_expr • T_MINUS mixed_expr
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   70           | mixed_expr • T_DIVIDE mixed_expr
+   71           | T_LEFT mixed_expr • T_RIGHT
+
+    T_PLUS      shift, and go to state 61
+    T_MINUS     shift, and go to state 62
+    T_MULTIPLY  shift, and go to state 63
+    T_DIVIDE    shift, and go to state 64
+    T_RIGHT     shift, and go to state 66
+
+
+State 36
+
+   57 declaracao: T_PRIMITIVO T_ID • T_ASSIGN condicao
+   58           | T_PRIMITIVO T_ID • T_ASSIGN mixed_expr
+
+    T_ASSIGN  shift, and go to state 67
+
+
+State 37
+
+   55 declaracao: T_CONST T_PRIMITIVO • T_ID T_ASSIGN mixed_expr
+   56           | T_CONST T_PRIMITIVO • T_ID T_ASSIGN condicao
+
+    T_ID  shift, and go to state 68
+
+
+State 38
+
+   53 declaracao: T_ID T_ASSIGN • mixed_expr
+   54           | T_ID T_ASSIGN • condicao
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_ID                shift, and go to state 41
+    T_LEFT_PARENTHESES  shift, and go to state 9
+
+    condicao    go to state 69
+    condicao_3  go to state 28
+    mixed_expr  go to state 70
+
+
+State 39
+
+   59 incremento: T_ID T_INCREMENT •
+
+    $default  reduce using rule 59 (incremento)
+
+
+State 40
+
+   46 condicao_3: T_ID T_LOGIC_OPERATOR • mixed_expr
+   48           | T_ID T_LOGIC_OPERATOR • T_ID
+
+    T_INT   shift, and go to state 1
+    T_REAL  shift, and go to state 2
+    T_LEFT  shift, and go to state 3
+    T_ID    shift, and go to state 71
+
+    mixed_expr  go to state 72
+
+
+State 41
+
+   46 condicao_3: T_ID • T_LOGIC_OPERATOR mixed_expr
+   48           | T_ID • T_LOGIC_OPERATOR T_ID
+
+    T_LOGIC_OPERATOR  shift, and go to state 40
+
+
+State 42
+
+   49 condicao_3: T_LEFT_PARENTHESES condicao • T_RIGHT_PARENTHESES
+
+    T_RIGHT_PARENTHESES  shift, and go to state 73
+
+
+State 43
+
+   25 when: T_SWITCH T_LEFT_PARENTHESES • T_ID T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK
+
+    T_ID  shift, and go to state 74
+
+
+State 44
+
+   34 loop_for: T_FOR T_LEFT_PARENTHESES • loop_for_cond T_RIGHT_PARENTHESES function_block
+
+    T_PRIMITIVO  shift, and go to state 5
+    T_CONST      shift, and go to state 7
+    T_ID         shift, and go to state 75
+
+    $default  reduce using rule 37 (loop_for_dec)
+
+    loop_for_cond  go to state 76
+    loop_for_dec   go to state 77
+    declaracao     go to state 78
+
+
+State 45
+
+   31 loop_while: T_WHILE T_LEFT_PARENTHESES • loop_while_cond T_RIGHT_PARENTHESES function_block
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_ID                shift, and go to state 41
+    T_LEFT_PARENTHESES  shift, and go to state 9
+
+    $default  reduce using rule 33 (loop_while_cond)
+
+    loop_while_cond  go to state 79
+    condicao         go to state 80
+    condicao_3       go to state 28
+    mixed_expr       go to state 34
+
+
+State 46
+
+   15 function_block: T_LEFT_BLOCK • function_statements T_RIGHT_BLOCK
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    $default  reduce using rule 18 (function_statements)
+
+    statement            go to state 81
+    function_statements  go to state 82
+    chamada_funcao       go to state 21
+    funcao_scope         go to state 22
+    when                 go to state 23
+    loop_while           go to state 24
+    loop_for             go to state 25
+    loop_do              go to state 26
+    condicao             go to state 27
+    condicao_3           go to state 28
+    logico_if            go to state 29
+    cond_2               go to state 30
+    declaracao           go to state 31
+    incremento           go to state 32
+    comentario           go to state 33
+    mixed_expr           go to state 34
+
+
+State 47
+
+   16 function_block: statement •
+
+    $default  reduce using rule 16 (function_block)
+
+
+State 48
+
+   41 loop_do: T_DO function_block • T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES T_SEPARATOR
+
+    T_WHILE  shift, and go to state 83
+
+
+State 49
+
+   52 cond_2: T_CONDICIONAL T_LEFT_PARENTHESES • condicao T_RIGHT_PARENTHESES function_block
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_ID                shift, and go to state 41
+    T_LEFT_PARENTHESES  shift, and go to state 9
+
+    condicao    go to state 84
+    condicao_3  go to state 28
+    mixed_expr  go to state 34
+
+
+State 50
+
+   51 logico_if: T_CONT_CONDICIONAL function_block •
+
+    $default  reduce using rule 51 (logico_if)
+
+
+State 51
+
+   63 comm_ml: T_NEWLINE • comm_ml
+
+    T_NEWLINE    shift, and go to state 51
+    T_COMMENT_C  shift, and go to state 52
+
+    $default  reduce using rule 64 (comm_ml)
+
+    comm_ml  go to state 85
+
+
+State 52
+
+   62 comm_ml: T_COMMENT_C • comm_ml
+
+    T_NEWLINE    shift, and go to state 51
+    T_COMMENT_C  shift, and go to state 52
+
+    $default  reduce using rule 64 (comm_ml)
+
+    comm_ml  go to state 86
+
+
+State 53
+
+   61 comentario: T_MLC_START comm_ml • T_MLC_END
+
+    T_MLC_END  shift, and go to state 87
+
+
+State 54
+
+    0 $accept: start_ $end •
+
+    $default  accept
+
+
+State 55
+
+    2 start_2: statement start_2 •
+
+    $default  reduce using rule 2 (start_2)
+
+
+State 56
+
+   19 chamada_funcao: funcao_scope T_LEFT_PARENTHESES • funcao_args T_RIGHT_PARENTHESES T_SEPARATOR
+
+    T_ID      shift, and go to state 88
+    T_STRING  shift, and go to state 89
+
+    $default  reduce using rule 22 (funcao_args)
+
+    funcao_args  go to state 90
+
+
+State 57
+
+   44 condicao_2: T_LOGIC_OPERATOR • condicao_3 condicao_2
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_ID                shift, and go to state 41
+    T_LEFT_PARENTHESES  shift, and go to state 9
+
+    condicao_3  go to state 91
+    mixed_expr  go to state 34
+
+
+State 58
+
+   42 condicao: condicao_3 condicao_2 •
+
+    $default  reduce using rule 42 (condicao)
+
+
+State 59
+
+    7 statement: declaracao T_SEPARATOR •
+
+    $default  reduce using rule 7 (statement)
+
+
+State 60
+
+   11 statement: incremento T_SEPARATOR •
+
+    $default  reduce using rule 11 (statement)
+
+
+State 61
+
+   67 mixed_expr: mixed_expr T_PLUS • mixed_expr
+
+    T_INT   shift, and go to state 1
+    T_REAL  shift, and go to state 2
+    T_LEFT  shift, and go to state 3
+
+    mixed_expr  go to state 92
+
+
+State 62
+
+   68 mixed_expr: mixed_expr T_MINUS • mixed_expr
+
+    T_INT   shift, and go to state 1
+    T_REAL  shift, and go to state 2
+    T_LEFT  shift, and go to state 3
+
+    mixed_expr  go to state 93
+
+
+State 63
+
+   69 mixed_expr: mixed_expr T_MULTIPLY • mixed_expr
+
+    T_INT   shift, and go to state 1
+    T_REAL  shift, and go to state 2
+    T_LEFT  shift, and go to state 3
+
+    mixed_expr  go to state 94
+
+
+State 64
+
+   70 mixed_expr: mixed_expr T_DIVIDE • mixed_expr
+
+    T_INT   shift, and go to state 1
+    T_REAL  shift, and go to state 2
+    T_LEFT  shift, and go to state 3
+
+    mixed_expr  go to state 95
+
+
+State 65
+
+   45 condicao_3: mixed_expr T_LOGIC_OPERATOR • mixed_expr
+   47           | mixed_expr T_LOGIC_OPERATOR • T_ID
+
+    T_INT   shift, and go to state 1
+    T_REAL  shift, and go to state 2
+    T_LEFT  shift, and go to state 3
+    T_ID    shift, and go to state 96
+
+    mixed_expr  go to state 97
+
+
+State 66
+
+   71 mixed_expr: T_LEFT mixed_expr T_RIGHT •
+
+    $default  reduce using rule 71 (mixed_expr)
+
+
+State 67
+
+   57 declaracao: T_PRIMITIVO T_ID T_ASSIGN • condicao
+   58           | T_PRIMITIVO T_ID T_ASSIGN • mixed_expr
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_ID                shift, and go to state 41
+    T_LEFT_PARENTHESES  shift, and go to state 9
+
+    condicao    go to state 98
+    condicao_3  go to state 28
+    mixed_expr  go to state 99
+
+
+State 68
+
+   55 declaracao: T_CONST T_PRIMITIVO T_ID • T_ASSIGN mixed_expr
+   56           | T_CONST T_PRIMITIVO T_ID • T_ASSIGN condicao
+
+    T_ASSIGN  shift, and go to state 100
+
+
+State 69
+
+   54 declaracao: T_ID T_ASSIGN condicao •
+
+    $default  reduce using rule 54 (declaracao)
+
+
+State 70
+
+   45 condicao_3: mixed_expr • T_LOGIC_OPERATOR mixed_expr
+   47           | mixed_expr • T_LOGIC_OPERATOR T_ID
+   53 declaracao: T_ID T_ASSIGN mixed_expr •
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   68           | mixed_expr • T_MINUS mixed_expr
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   70           | mixed_expr • T_DIVIDE mixed_expr
+
+    T_PLUS            shift, and go to state 61
+    T_MINUS           shift, and go to state 62
+    T_MULTIPLY        shift, and go to state 63
+    T_DIVIDE          shift, and go to state 64
+    T_LOGIC_OPERATOR  shift, and go to state 65
+
+    $default  reduce using rule 53 (declaracao)
+
+
+State 71
+
+   48 condicao_3: T_ID T_LOGIC_OPERATOR T_ID •
+
+    $default  reduce using rule 48 (condicao_3)
+
+
+State 72
+
+   46 condicao_3: T_ID T_LOGIC_OPERATOR mixed_expr •
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   68           | mixed_expr • T_MINUS mixed_expr
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   70           | mixed_expr • T_DIVIDE mixed_expr
+
+    T_PLUS      shift, and go to state 61
+    T_MINUS     shift, and go to state 62
+    T_MULTIPLY  shift, and go to state 63
+    T_DIVIDE    shift, and go to state 64
+
+    $default  reduce using rule 46 (condicao_3)
+
+
+State 73
+
+   49 condicao_3: T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES •
+
+    $default  reduce using rule 49 (condicao_3)
+
+
+State 74
+
+   25 when: T_SWITCH T_LEFT_PARENTHESES T_ID • T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK
+
+    T_RIGHT_PARENTHESES  shift, and go to state 101
+
+
+State 75
+
+   53 declaracao: T_ID • T_ASSIGN mixed_expr
+   54           | T_ID • T_ASSIGN condicao
+
+    T_ASSIGN  shift, and go to state 38
+
+
+State 76
+
+   34 loop_for: T_FOR T_LEFT_PARENTHESES loop_for_cond • T_RIGHT_PARENTHESES function_block
+
+    T_RIGHT_PARENTHESES  shift, and go to state 102
+
+
+State 77
+
+   35 loop_for_cond: loop_for_dec • T_SEPARATOR loop_for_condicao T_SEPARATOR loop_for_inc
+
+    T_SEPARATOR  shift, and go to state 103
+
+
+State 78
+
+   36 loop_for_dec: declaracao •
+
+    $default  reduce using rule 36 (loop_for_dec)
+
+
+State 79
+
+   31 loop_while: T_WHILE T_LEFT_PARENTHESES loop_while_cond • T_RIGHT_PARENTHESES function_block
+
+    T_RIGHT_PARENTHESES  shift, and go to state 104
+
+
+State 80
+
+   32 loop_while_cond: condicao • loop_while_cond
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_ID                shift, and go to state 41
+    T_LEFT_PARENTHESES  shift, and go to state 9
+
+    $default  reduce using rule 33 (loop_while_cond)
+
+    loop_while_cond  go to state 105
+    condicao         go to state 80
+    condicao_3       go to state 28
+    mixed_expr       go to state 34
+
+
+State 81
+
+   17 function_statements: statement • function_statements
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    $default  reduce using rule 18 (function_statements)
+
+    statement            go to state 81
+    function_statements  go to state 106
+    chamada_funcao       go to state 21
+    funcao_scope         go to state 22
+    when                 go to state 23
+    loop_while           go to state 24
+    loop_for             go to state 25
+    loop_do              go to state 26
+    condicao             go to state 27
+    condicao_3           go to state 28
+    logico_if            go to state 29
+    cond_2               go to state 30
+    declaracao           go to state 31
+    incremento           go to state 32
+    comentario           go to state 33
+    mixed_expr           go to state 34
+
+
+State 82
+
+   15 function_block: T_LEFT_BLOCK function_statements • T_RIGHT_BLOCK
+
+    T_RIGHT_BLOCK  shift, and go to state 107
+
+
+State 83
+
+   41 loop_do: T_DO function_block T_WHILE • T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES T_SEPARATOR
+
+    T_LEFT_PARENTHESES  shift, and go to state 108
+
+
+State 84
+
+   52 cond_2: T_CONDICIONAL T_LEFT_PARENTHESES condicao • T_RIGHT_PARENTHESES function_block
+
+    T_RIGHT_PARENTHESES  shift, and go to state 109
+
+
+State 85
+
+   63 comm_ml: T_NEWLINE comm_ml •
+
+    $default  reduce using rule 63 (comm_ml)
+
+
+State 86
+
+   62 comm_ml: T_COMMENT_C comm_ml •
+
+    $default  reduce using rule 62 (comm_ml)
+
+
+State 87
+
+   61 comentario: T_MLC_START comm_ml T_MLC_END •
+
+    $default  reduce using rule 61 (comentario)
+
+
+State 88
+
+   24 funcao_args: T_ID •
+
+    $default  reduce using rule 24 (funcao_args)
+
+
+State 89
+
+   23 funcao_args: T_STRING •
+
+    $default  reduce using rule 23 (funcao_args)
+
+
+State 90
+
+   19 chamada_funcao: funcao_scope T_LEFT_PARENTHESES funcao_args • T_RIGHT_PARENTHESES T_SEPARATOR
+
+    T_RIGHT_PARENTHESES  shift, and go to state 110
+
+
+State 91
+
+   44 condicao_2: T_LOGIC_OPERATOR condicao_3 • condicao_2
+
+    T_LOGIC_OPERATOR  shift, and go to state 57
+
+    $default  reduce using rule 43 (condicao_2)
+
+    condicao_2  go to state 111
+
+
+State 92
+
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   67           | mixed_expr T_PLUS mixed_expr •
+   68           | mixed_expr • T_MINUS mixed_expr
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   70           | mixed_expr • T_DIVIDE mixed_expr
+
+    T_MULTIPLY  shift, and go to state 63
+    T_DIVIDE    shift, and go to state 64
+
+    $default  reduce using rule 67 (mixed_expr)
+
+
+State 93
+
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   68           | mixed_expr • T_MINUS mixed_expr
+   68           | mixed_expr T_MINUS mixed_expr •
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   70           | mixed_expr • T_DIVIDE mixed_expr
+
+    T_MULTIPLY  shift, and go to state 63
+    T_DIVIDE    shift, and go to state 64
+
+    $default  reduce using rule 68 (mixed_expr)
+
+
+State 94
+
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   68           | mixed_expr • T_MINUS mixed_expr
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   69           | mixed_expr T_MULTIPLY mixed_expr •
+   70           | mixed_expr • T_DIVIDE mixed_expr
+
+    $default  reduce using rule 69 (mixed_expr)
+
+
+State 95
+
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   68           | mixed_expr • T_MINUS mixed_expr
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   70           | mixed_expr • T_DIVIDE mixed_expr
+   70           | mixed_expr T_DIVIDE mixed_expr •
+
+    $default  reduce using rule 70 (mixed_expr)
+
+
+State 96
+
+   47 condicao_3: mixed_expr T_LOGIC_OPERATOR T_ID •
+
+    $default  reduce using rule 47 (condicao_3)
+
+
+State 97
+
+   45 condicao_3: mixed_expr T_LOGIC_OPERATOR mixed_expr •
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   68           | mixed_expr • T_MINUS mixed_expr
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   70           | mixed_expr • T_DIVIDE mixed_expr
+
+    T_PLUS      shift, and go to state 61
+    T_MINUS     shift, and go to state 62
+    T_MULTIPLY  shift, and go to state 63
+    T_DIVIDE    shift, and go to state 64
+
+    $default  reduce using rule 45 (condicao_3)
+
+
+State 98
+
+   57 declaracao: T_PRIMITIVO T_ID T_ASSIGN condicao •
+
+    $default  reduce using rule 57 (declaracao)
+
+
+State 99
+
+   45 condicao_3: mixed_expr • T_LOGIC_OPERATOR mixed_expr
+   47           | mixed_expr • T_LOGIC_OPERATOR T_ID
+   58 declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr •
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   68           | mixed_expr • T_MINUS mixed_expr
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   70           | mixed_expr • T_DIVIDE mixed_expr
+
+    T_PLUS            shift, and go to state 61
+    T_MINUS           shift, and go to state 62
+    T_MULTIPLY        shift, and go to state 63
+    T_DIVIDE          shift, and go to state 64
+    T_LOGIC_OPERATOR  shift, and go to state 65
+
+    $default  reduce using rule 58 (declaracao)
+
+
+State 100
+
+   55 declaracao: T_CONST T_PRIMITIVO T_ID T_ASSIGN • mixed_expr
+   56           | T_CONST T_PRIMITIVO T_ID T_ASSIGN • condicao
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_ID                shift, and go to state 41
+    T_LEFT_PARENTHESES  shift, and go to state 9
+
+    condicao    go to state 112
+    condicao_3  go to state 28
+    mixed_expr  go to state 113
+
+
+State 101
+
+   25 when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES • T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK
+
+    T_LEFT_BLOCK  shift, and go to state 114
+
+
+State 102
+
+   34 loop_for: T_FOR T_LEFT_PARENTHESES loop_for_cond T_RIGHT_PARENTHESES • function_block
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_BLOCK        shift, and go to state 46
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    statement       go to state 47
+    function_block  go to state 115
+    chamada_funcao  go to state 21
+    funcao_scope    go to state 22
+    when            go to state 23
+    loop_while      go to state 24
+    loop_for        go to state 25
+    loop_do         go to state 26
+    condicao        go to state 27
+    condicao_3      go to state 28
+    logico_if       go to state 29
+    cond_2          go to state 30
+    declaracao      go to state 31
+    incremento      go to state 32
+    comentario      go to state 33
+    mixed_expr      go to state 34
+
+
+State 103
+
+   35 loop_for_cond: loop_for_dec T_SEPARATOR • loop_for_condicao T_SEPARATOR loop_for_inc
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_ID                shift, and go to state 41
+    T_LEFT_PARENTHESES  shift, and go to state 9
+
+    loop_for_condicao  go to state 116
+    condicao           go to state 117
+    condicao_3         go to state 28
+    mixed_expr         go to state 34
+
+
+State 104
+
+   31 loop_while: T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES • function_block
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_BLOCK        shift, and go to state 46
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    statement       go to state 47
+    function_block  go to state 118
+    chamada_funcao  go to state 21
+    funcao_scope    go to state 22
+    when            go to state 23
+    loop_while      go to state 24
+    loop_for        go to state 25
+    loop_do         go to state 26
+    condicao        go to state 27
+    condicao_3      go to state 28
+    logico_if       go to state 29
+    cond_2          go to state 30
+    declaracao      go to state 31
+    incremento      go to state 32
+    comentario      go to state 33
+    mixed_expr      go to state 34
+
+
+State 105
+
+   32 loop_while_cond: condicao loop_while_cond •
+
+    $default  reduce using rule 32 (loop_while_cond)
+
+
+State 106
+
+   17 function_statements: statement function_statements •
+
+    $default  reduce using rule 17 (function_statements)
+
+
+State 107
+
+   15 function_block: T_LEFT_BLOCK function_statements T_RIGHT_BLOCK •
+
+    $default  reduce using rule 15 (function_block)
+
+
+State 108
+
+   41 loop_do: T_DO function_block T_WHILE T_LEFT_PARENTHESES • loop_while_cond T_RIGHT_PARENTHESES T_SEPARATOR
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_ID                shift, and go to state 41
+    T_LEFT_PARENTHESES  shift, and go to state 9
+
+    $default  reduce using rule 33 (loop_while_cond)
+
+    loop_while_cond  go to state 119
+    condicao         go to state 80
+    condicao_3       go to state 28
+    mixed_expr       go to state 34
+
+
+State 109
+
+   52 cond_2: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES • function_block
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_BLOCK        shift, and go to state 46
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    statement       go to state 47
+    function_block  go to state 120
+    chamada_funcao  go to state 21
+    funcao_scope    go to state 22
+    when            go to state 23
+    loop_while      go to state 24
+    loop_for        go to state 25
+    loop_do         go to state 26
+    condicao        go to state 27
+    condicao_3      go to state 28
+    logico_if       go to state 29
+    cond_2          go to state 30
+    declaracao      go to state 31
+    incremento      go to state 32
+    comentario      go to state 33
+    mixed_expr      go to state 34
+
+
+State 110
+
+   19 chamada_funcao: funcao_scope T_LEFT_PARENTHESES funcao_args T_RIGHT_PARENTHESES • T_SEPARATOR
+
+    T_SEPARATOR  shift, and go to state 121
+
+
+State 111
+
+   44 condicao_2: T_LOGIC_OPERATOR condicao_3 condicao_2 •
+
+    $default  reduce using rule 44 (condicao_2)
+
+
+State 112
+
+   56 declaracao: T_CONST T_PRIMITIVO T_ID T_ASSIGN condicao •
+
+    $default  reduce using rule 56 (declaracao)
+
+
+State 113
+
+   45 condicao_3: mixed_expr • T_LOGIC_OPERATOR mixed_expr
+   47           | mixed_expr • T_LOGIC_OPERATOR T_ID
+   55 declaracao: T_CONST T_PRIMITIVO T_ID T_ASSIGN mixed_expr •
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   68           | mixed_expr • T_MINUS mixed_expr
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   70           | mixed_expr • T_DIVIDE mixed_expr
+
+    T_PLUS            shift, and go to state 61
+    T_MINUS           shift, and go to state 62
+    T_MULTIPLY        shift, and go to state 63
+    T_DIVIDE          shift, and go to state 64
+    T_LOGIC_OPERATOR  shift, and go to state 65
+
+    $default  reduce using rule 55 (declaracao)
+
+
+State 114
+
+   25 when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES T_LEFT_BLOCK • switch_statement T_RIGHT_BLOCK
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 122
+    T_ID                shift, and go to state 123
+    T_CONT_CONDICIONAL  shift, and go to state 124
+
+    $default  reduce using rule 30 (switch_statement)
+
+    switch_statement  go to state 125
+    mixed_expr        go to state 126
+
+
+State 115
+
+   34 loop_for: T_FOR T_LEFT_PARENTHESES loop_for_cond T_RIGHT_PARENTHESES function_block •
+
+    $default  reduce using rule 34 (loop_for)
+
+
+State 116
+
+   35 loop_for_cond: loop_for_dec T_SEPARATOR loop_for_condicao • T_SEPARATOR loop_for_inc
+
+    T_SEPARATOR  shift, and go to state 127
+
+
+State 117
+
+   38 loop_for_condicao: condicao •
+
+    $default  reduce using rule 38 (loop_for_condicao)
+
+
+State 118
+
+   31 loop_while: T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES function_block •
+
+    $default  reduce using rule 31 (loop_while)
+
+
+State 119
+
+   41 loop_do: T_DO function_block T_WHILE T_LEFT_PARENTHESES loop_while_cond • T_RIGHT_PARENTHESES T_SEPARATOR
+
+    T_RIGHT_PARENTHESES  shift, and go to state 128
+
+
+State 120
+
+   52 cond_2: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_block •
+
+    $default  reduce using rule 52 (cond_2)
+
+
+State 121
+
+   19 chamada_funcao: funcao_scope T_LEFT_PARENTHESES funcao_args T_RIGHT_PARENTHESES T_SEPARATOR •
+
+    $default  reduce using rule 19 (chamada_funcao)
+
+
+State 122
+
+   26 switch_statement: T_NEWLINE • switch_statement
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 122
+    T_ID                shift, and go to state 123
+    T_CONT_CONDICIONAL  shift, and go to state 124
+
+    $default  reduce using rule 30 (switch_statement)
+
+    switch_statement  go to state 129
+    mixed_expr        go to state 126
+
+
+State 123
+
+   27 switch_statement: T_ID • T_ARROW_RIGHT function_block switch_statement
+
+    T_ARROW_RIGHT  shift, and go to state 130
+
+
+State 124
+
+   29 switch_statement: T_CONT_CONDICIONAL • T_ARROW_RIGHT function_block switch_statement
+
+    T_ARROW_RIGHT  shift, and go to state 131
+
+
+State 125
+
+   25 when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement • T_RIGHT_BLOCK
+
+    T_RIGHT_BLOCK  shift, and go to state 132
+
+
+State 126
+
+   28 switch_statement: mixed_expr • T_ARROW_RIGHT function_block switch_statement
+   67 mixed_expr: mixed_expr • T_PLUS mixed_expr
+   68           | mixed_expr • T_MINUS mixed_expr
+   69           | mixed_expr • T_MULTIPLY mixed_expr
+   70           | mixed_expr • T_DIVIDE mixed_expr
+
+    T_PLUS         shift, and go to state 61
+    T_MINUS        shift, and go to state 62
+    T_MULTIPLY     shift, and go to state 63
+    T_DIVIDE       shift, and go to state 64
+    T_ARROW_RIGHT  shift, and go to state 133
+
+
+State 127
+
+   35 loop_for_cond: loop_for_dec T_SEPARATOR loop_for_condicao T_SEPARATOR • loop_for_inc
+
+    T_ID  shift, and go to state 134
+
+    $default  reduce using rule 40 (loop_for_inc)
+
+    loop_for_inc  go to state 135
+    incremento    go to state 136
+
+
+State 128
+
+   41 loop_do: T_DO function_block T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES • T_SEPARATOR
+
+    T_SEPARATOR  shift, and go to state 137
+
+
+State 129
+
+   26 switch_statement: T_NEWLINE switch_statement •
+
+    $default  reduce using rule 26 (switch_statement)
+
+
+State 130
+
+   27 switch_statement: T_ID T_ARROW_RIGHT • function_block switch_statement
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_BLOCK        shift, and go to state 46
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    statement       go to state 47
+    function_block  go to state 138
+    chamada_funcao  go to state 21
+    funcao_scope    go to state 22
+    when            go to state 23
+    loop_while      go to state 24
+    loop_for        go to state 25
+    loop_do         go to state 26
+    condicao        go to state 27
+    condicao_3      go to state 28
+    logico_if       go to state 29
+    cond_2          go to state 30
+    declaracao      go to state 31
+    incremento      go to state 32
+    comentario      go to state 33
+    mixed_expr      go to state 34
+
+
+State 131
+
+   29 switch_statement: T_CONT_CONDICIONAL T_ARROW_RIGHT • function_block switch_statement
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_BLOCK        shift, and go to state 46
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    statement       go to state 47
+    function_block  go to state 139
+    chamada_funcao  go to state 21
+    funcao_scope    go to state 22
+    when            go to state 23
+    loop_while      go to state 24
+    loop_for        go to state 25
+    loop_do         go to state 26
+    condicao        go to state 27
+    condicao_3      go to state 28
+    logico_if       go to state 29
+    cond_2          go to state 30
+    declaracao      go to state 31
+    incremento      go to state 32
+    comentario      go to state 33
+    mixed_expr      go to state 34
+
+
+State 132
+
+   25 when: T_SWITCH T_LEFT_PARENTHESES T_ID T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK •
+
+    $default  reduce using rule 25 (when)
+
+
+State 133
+
+   28 switch_statement: mixed_expr T_ARROW_RIGHT • function_block switch_statement
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 4
+    T_PRIMITIVO         shift, and go to state 5
+    T_RESERVED          shift, and go to state 6
+    T_CONST             shift, and go to state 7
+    T_ID                shift, and go to state 8
+    T_LEFT_BLOCK        shift, and go to state 46
+    T_LEFT_PARENTHESES  shift, and go to state 9
+    T_SWITCH            shift, and go to state 10
+    T_FOR               shift, and go to state 11
+    T_WHILE             shift, and go to state 12
+    T_DO                shift, and go to state 13
+    T_CONDICIONAL       shift, and go to state 14
+    T_CONT_CONDICIONAL  shift, and go to state 15
+    T_MLC_START         shift, and go to state 16
+    T_SLC               shift, and go to state 17
+
+    statement       go to state 47
+    function_block  go to state 140
+    chamada_funcao  go to state 21
+    funcao_scope    go to state 22
+    when            go to state 23
+    loop_while      go to state 24
+    loop_for        go to state 25
+    loop_do         go to state 26
+    condicao        go to state 27
+    condicao_3      go to state 28
+    logico_if       go to state 29
+    cond_2          go to state 30
+    declaracao      go to state 31
+    incremento      go to state 32
+    comentario      go to state 33
+    mixed_expr      go to state 34
+
+
+State 134
+
+   59 incremento: T_ID • T_INCREMENT
+
+    T_INCREMENT  shift, and go to state 39
+
+
+State 135
+
+   35 loop_for_cond: loop_for_dec T_SEPARATOR loop_for_condicao T_SEPARATOR loop_for_inc •
+
+    $default  reduce using rule 35 (loop_for_cond)
+
+
+State 136
+
+   39 loop_for_inc: incremento •
+
+    $default  reduce using rule 39 (loop_for_inc)
+
+
+State 137
+
+   41 loop_do: T_DO function_block T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES T_SEPARATOR •
+
+    $default  reduce using rule 41 (loop_do)
+
+
+State 138
+
+   27 switch_statement: T_ID T_ARROW_RIGHT function_block • switch_statement
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 122
+    T_ID                shift, and go to state 123
+    T_CONT_CONDICIONAL  shift, and go to state 124
+
+    $default  reduce using rule 30 (switch_statement)
+
+    switch_statement  go to state 141
+    mixed_expr        go to state 126
+
+
+State 139
+
+   29 switch_statement: T_CONT_CONDICIONAL T_ARROW_RIGHT function_block • switch_statement
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 122
+    T_ID                shift, and go to state 123
+    T_CONT_CONDICIONAL  shift, and go to state 124
+
+    $default  reduce using rule 30 (switch_statement)
+
+    switch_statement  go to state 142
+    mixed_expr        go to state 126
+
+
+State 140
+
+   28 switch_statement: mixed_expr T_ARROW_RIGHT function_block • switch_statement
+
+    T_INT               shift, and go to state 1
+    T_REAL              shift, and go to state 2
+    T_LEFT              shift, and go to state 3
+    T_NEWLINE           shift, and go to state 122
+    T_ID                shift, and go to state 123
+    T_CONT_CONDICIONAL  shift, and go to state 124
+
+    $default  reduce using rule 30 (switch_statement)
+
+    switch_statement  go to state 143
+    mixed_expr        go to state 126
+
+
+State 141
+
+   27 switch_statement: T_ID T_ARROW_RIGHT function_block switch_statement •
+
+    $default  reduce using rule 27 (switch_statement)
+
+
+State 142
+
+   29 switch_statement: T_CONT_CONDICIONAL T_ARROW_RIGHT function_block switch_statement •
+
+    $default  reduce using rule 29 (switch_statement)
+
+
+State 143
+
+   28 switch_statement: mixed_expr T_ARROW_RIGHT function_block switch_statement •
+
+    $default  reduce using rule 28 (switch_statement)
