@@ -4,3 +4,4 @@ lex.yy.c
 *.tab.*
 *.dot
 *conflito*
+!arquivos_dot/*
