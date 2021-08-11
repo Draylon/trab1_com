@@ -205,7 +205,6 @@ void|char|short|int|long|float|double|signed|unsigned {
     parse_print("Soma",yytext);
     col += strlen(yytext);
     return T_OP_SUM;
-    
 }
 
 "-" {
@@ -223,7 +222,7 @@ void|char|short|int|long|float|double|signed|unsigned {
     
 }
 
-"+"|"-"|"*"|"/" {
+"/" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Um operador",yytext);
     col += strlen(yytext);

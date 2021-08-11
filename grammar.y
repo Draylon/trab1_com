@@ -31,12 +31,10 @@ void yyerror(const char* s);
 %left T_CONT_CONDICIONAL
 %token T_ASSIGN T_INCREMENT T_RETURN T_LOGIC_OPERATOR T_ARROW_RIGHT
 %token T_LEFT_POINTER T_RIGHT_POINTER
-%token T_OP_SUM T_OP_SUB T_OP_MUL T_OP_DIV
+%left T_OP_SUM T_OP_SUB T_OP_MUL T_OP_DIV
 %token T_MLC_START T_MLC_END T_EMPTY
 %token T_STRING T_TAB T_CARRIER T_UNKNOWN
 %token T_COMMENT_C T_SLC
-%left T_PLUS T_MINUS
-%left T_MULTIPLY T_DIVIDE
 
 
 %type<fval> mixed_expr
@@ -171,10 +169,10 @@ comm_ml: T_COMMENT_C comm_ml | T_NEWLINE comm_ml | ;
 
 mixed_expr: T_REAL							{ $$ = $1; }
 	| T_INT								{ $$ = $1;}
-	| mixed_expr T_PLUS mixed_expr		{ $$ = $1 + $3; }
-	| mixed_expr T_MINUS mixed_expr		{ $$ = $1 - $3; }
-	| mixed_expr T_MULTIPLY mixed_expr	{ $$ = $1 * $3; }
-	| mixed_expr T_DIVIDE mixed_expr		{ $$ = $1 / $3; }
+	| mixed_expr T_OP_SUM mixed_expr		{ $$ = $1 + $3; }
+	| mixed_expr T_OP_SUB mixed_expr		{ $$ = $1 - $3; }
+	| mixed_expr T_OP_MUL mixed_expr	{ $$ = $1 * $3; }
+	| mixed_expr T_OP_DIV mixed_expr		{ $$ = $1 / $3; }
 	| T_LEFT mixed_expr T_RIGHT			{ $$ = $2; }
 	;
 

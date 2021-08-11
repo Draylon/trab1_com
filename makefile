@@ -25,3 +25,6 @@ run: clean all
 
 flex_run: clean flex
 	gcc lex.yy.c -lfl -lm -o binary
+
+bison_run: clean
+	bison -d -g grammar.y
