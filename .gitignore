@@ -6,3 +6,4 @@ lex.yy.c
 *conflito*
 !svg_gramatica/*
 !arquivos_dot/*
+*.svg
