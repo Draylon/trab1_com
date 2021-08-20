@@ -7,3 +7,4 @@ lex.yy.c
 !svg_gramatica/*
 !arquivos_dot/*
 *.svg
+jasmin-1.1
