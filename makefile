@@ -28,3 +28,40 @@ flex_run: clean flex
 
 bison_run: clean
 	bison -d -g grammar.y
+
+#========
+# jasmin
+#========
+
+exec: all
+	./a.out
+
+java:
+	javac test.java
+	javap -c test.class
+
+error: 
+	bison --verbose syntax.y
+
+custom_run: all
+	./a.out tests/test6
+	java -jar ./jasmin-1.1/jasmin.jar output.j
+	java test
+
+jasmine_temp:
+	java -jar ./jasmin-1.1/jasmin.jar output.j
+
+d_jasmine_temp:
+	java.exe -jar ./jasmin-1.1/jasmin.jar output.j
+
+java_run:
+	java test
+
+d_java_run:
+	javac.exe tests/test.java
+	javap.exe -c test.class
+	java.exe test
+
+exec_jasm: exec jasmine_temp run
+
+d_exec_jasm: exec d_jasmine_temp d_run
