@@ -68,6 +68,10 @@ void defineVariable(std::string name, int varType) {
 	}
 }
 
+std::string genLabel(){
+	return "L_"+std::to_string(labelsCount++);
+}
+
 void writeCode(std::string x){
 	codeList.push_back(x);
 }

@@ -15,7 +15,7 @@
 
 
 extern int yylex();
-//extern int yyparse();
+extern int yyparse();
 extern FILE* yyin;
 
 
@@ -34,7 +34,7 @@ std::map<std::string, std::pair<int,type_enum> > symbTab;
 %union {
     int ival;
     float fval;
-    char * id;
+    char * idval;
     char * aopval;
 
     struct {
@@ -85,10 +85,6 @@ std::map<std::string, std::pair<int,type_enum> > symbTab;
 %type <stmt_type> loop_while
 %type <stmt_type> loop_for
 %type <stmt_type> when
-%type <stmt_type> declaracao
-%type <stmt_type> comentario
-%type <stmt_type> chamada_funcao
-%type <stmt_type> incremento
 %type <stmt_type> loop_do
 %type <stmt_type> print
 
@@ -235,8 +231,8 @@ assign:
 
 declaracao: primitive_type T_ID T_ASSIGN mixed_expr {
     printf("\033[0;34mSintático atribuição\033[0m\n");
-    
-    defineVariable(std::to_string($2),$1);
+    std::string str($2);
+    defineVariable(str,1);
 };
 
 
