@@ -2,7 +2,7 @@
 all: bison flex gcc
 
 gcc:
-	g++ grammar.tab.c lex.yy.c -lm -lfl -o binary
+	g++ -std=c++11 grammar.tab.c lex.yy.c -lm -lfl -o binary
 
 flex:
 	flex principal.lex
