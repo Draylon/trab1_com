@@ -200,33 +200,11 @@ void|char|short|int|long|float|double|signed|unsigned {
 
 
 
-"+" {
+"+"|"-"|"*"|"/" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
-    parse_print("Soma",yytext);
+    parse_print("Operação matematica",yytext);
     col += strlen(yytext);
-    return T_OP_SUM;
-}
-
-"-" {
-    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
-    parse_print("Subtracao",yytext);
-    col += strlen(yytext);
-    return T_OP_SUB;
-}
-
-"*" {
-    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
-    parse_print("Multiplicacao",yytext);
-    col += strlen(yytext);
-    return T_OP_MUL;
-    
-}
-
-"/" {
-    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
-    parse_print("Um operador",yytext);
-    col += strlen(yytext);
-    return T_OP_DIV;
+    return T_ARITH_OP;
 }
 
 
@@ -251,6 +229,13 @@ void|char|short|int|long|float|double|signed|unsigned {
     return T_MLC_END;
 }
 
+
+print {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Imprimir na tela",yytext);
+    col += strlen(yytext);
+    return T_PRINT;
+}
 
 print|setlocale {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
@@ -339,7 +324,7 @@ else {
     
     printf("Quebra de linha\n");
     row+=1;
-    return T_NEWLINE;
+    //return T_NEWLINE;
 }
 
 . {

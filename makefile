@@ -2,7 +2,7 @@
 all: bison flex gcc
 
 gcc:
-	gcc grammar.tab.c lex.yy.c -lm -lfl -o binary
+	g++ grammar.tab.c lex.yy.c -lm -lfl -o binary
 
 flex:
 	flex principal.lex
@@ -24,7 +24,7 @@ run: clean all
 	./binary ./testes/arquivo.txt
 
 flex_run: clean flex
-	gcc lex.yy.c -lfl -lm -o binary
+	g++ lex.yy.c -lfl -lm -o binary
 
 bison_run: clean
 	bison -d -g grammar.y
@@ -34,7 +34,7 @@ bison_run: clean
 #========
 
 exec: all
-	./a.out
+	./binary
 
 java:
 	javac test.java
@@ -44,7 +44,7 @@ error:
 	bison --verbose syntax.y
 
 custom_run: all
-	./a.out tests/test6
+	./binary tests/test6
 	java -jar ./jasmin-1.1/jasmin.jar output.j
 	java test
 
