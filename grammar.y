@@ -19,13 +19,17 @@ extern int yyparse();
 extern FILE* yyin;
 
 
-ofstream fout("output.j");
+std::ofstream fout("output.j");
 
 void yyerror(const char* s);
 
-map<string, pair<int,type_enum> > symbTab;
+std::map<std::string, std::pair<int,type_enum> > symbTab;
 
 %}
+
+%code requires {
+	#include <vector>
+}
 
 %union {
     int ival;
@@ -38,7 +42,7 @@ map<string, pair<int,type_enum> > symbTab;
     } expr_type;
 
     struct {
-        std::vector<int> *trueList, *falseList;//no need for next because every if has else
+        std::vector<int> *trueList, *falseList;
     } bexpr_type;
 
     struct {
@@ -123,11 +127,11 @@ print: T_PRINT T_LEFT_PARENTHESES mixed_expr T_RIGHT_PARENTHESES T_SEPARATOR
     {
         /* expression is at top of stack now */
         /* save it at the predefined temp syso var */            
-        writeCode("istore " + to_string(symbTab["int_expr"].first));
+        writeCode("istore " + std::to_string(symbTab["int_expr"].first));
         /* call syso */            
         writeCode("getstatic      java/lang/System/out Ljava/io/PrintStream;");
         /*insert param*/
-        writeCode("iload " + to_string(symbTab["int_expr"].first ));
+        writeCode("iload " + std::to_string(symbTab["int_expr"].first ));
         /*invoke syso*/
         writeCode("invokevirtual java/io/PrintStream/println(I)V");
     };
@@ -245,10 +249,10 @@ comm_ml: T_COMMENT_C comm_ml | ;
 
 mixed_expr: T_INT {
         $$.sType = T_INT;
-        writeCode("ldc "+to_string($1));
+        writeCode("ldc "+std::to_string($1));
     }
     | mixed_expr T_ARITH_OP mixed_expr {
-        arithCast(string($2));
+        arithCast(std::string($2));
     }
     | T_LEFT mixed_expr T_RIGHT      { $$.sType = $2.sType; }
     ;
@@ -305,7 +309,7 @@ char **argv;
 void printCode(void){
 	for ( int i = 0 ; i < codeList.size() ; i++)
 	{
-		fout<<codeList[i]<<endl;
+		fout<<codeList[i]<<std::endl;
 	}
 }
 
@@ -319,7 +323,7 @@ int main (int argv, char * argc[]){
     ++argc, --argv;
     if ( argv > 0 ){
         yyin = fopen( argc[0], "r" );
-        outfileName = string(argc[1]);
+        outfileName = std::string(argc[1]);
     }else{
         yyin = stdin;
         outfileName = "input_code.txt";

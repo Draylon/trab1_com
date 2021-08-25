@@ -12,7 +12,6 @@ bison:
 
 clean:
 	rm -rf *.c
-	rm -rf *.h
 	rm -rf *.dot
 	rm -rf *.output
 	rm -rf *.tab.*
