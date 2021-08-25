@@ -15,7 +15,7 @@
 
 
 extern int yylex();
-extern int yyparse();
+//extern int yyparse();
 extern FILE* yyin;
 
 
@@ -80,10 +80,7 @@ std::map<std::string, std::pair<int,type_enum> > symbTab;
 
 %type <sType> primitive_type
 %type <expr_type> mixed_expr
-%type <bexpr_type> condicao
-%type <bexpr_type> condicao_2
-%type <bexpr_type> condicao_3
-%type <stmt_type> statement
+%type <bexpr_type> b_expr
 %type <stmt_type> logico_if
 %type <stmt_type> loop_while
 %type <stmt_type> loop_for
@@ -109,7 +106,18 @@ start_2: statement start_2
 
 statement_set: statement | statement marker statement_set;
 
-statement: print
+statement: 
+    logico_if
+	| when
+	| declaracao T_SEPARATOR
+	| comentario
+	| b_expr
+	| chamada_funcao
+	| incremento T_SEPARATOR
+	| loop_while
+	| loop_for
+	| loop_do
+    | print
     ;
 
 marker:{
@@ -140,8 +148,7 @@ print: T_PRINT T_LEFT_PARENTHESES mixed_expr T_RIGHT_PARENTHESES T_SEPARATOR
 
 
 
-function_block: T_LEFT_BLOCK function_statements T_RIGHT_BLOCK | statement;
-function_statements: statement function_statements | ;
+function_block: T_LEFT_BLOCK statement_set T_RIGHT_BLOCK | statement;
 
 
 
@@ -169,12 +176,12 @@ switch_statement: T_ID T_ARROW_RIGHT function_block switch_statement
 
 loop_while: T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático LOOP\033[0m\n");};
 
-loop_while_cond: condicao loop_while_cond | ;
+loop_while_cond: b_expr loop_while_cond | ;
 
 
 
 primitive_type: 
-	T_INT {$$ = T_INT;}
+	T_INT {$$ = T_INT; /* não sei pra que exatamente, mais peguei kkkkk */ }
 	;
 
 
@@ -183,29 +190,26 @@ loop_for: T_FOR T_LEFT_PARENTHESES loop_for_cond T_RIGHT_PARENTHESES function_bl
 
 loop_for_cond: loop_for_dec T_SEPARATOR loop_for_condicao T_SEPARATOR loop_for_inc;
 loop_for_dec: declaracao | ;
-loop_for_condicao: condicao;
+loop_for_condicao: b_expr;
 loop_for_inc: incremento | ;
 
 
 
 
-loop_do: T_DO function_block T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES T_SEPARATOR;
+loop_do: 
+    T_DO function_block T_WHILE 
+    T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES T_SEPARATOR {
+        printf("\033[0;34mSintático condicional 1\033[0m\n");
+    };
 
 
 
-condicao: 
-    condicao_3 condicao_2;
-
-condicao_2: |
-    T_LOGIC_OPERATOR condicao_3 condicao_2 { printf("\033[0;34mSintático condicional and/or \033[0m\n");}
-;
-
-condicao_3: 
+b_expr: 
     mixed_expr T_LOGIC_OPERATOR mixed_expr { printf("\033[0;34mSintático condicional 1\033[0m\n");}
   | T_ID T_LOGIC_OPERATOR mixed_expr { printf("\033[0;34mSintático condicional 2\033[0m\n");}
   | mixed_expr T_LOGIC_OPERATOR T_ID { printf("\033[0;34mSintático condicional 3\033[0m\n");}
   | T_ID T_LOGIC_OPERATOR T_ID { printf("\033[0;34mSintático condicional 4\033[0m\n");}
-  | T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES { printf("\033[0;34mSintático condicional 5\033[0m\n");};
+  | T_LEFT_PARENTHESES b_expr T_RIGHT_PARENTHESES { printf("\033[0;34mSintático condicional 5\033[0m\n");};
 
 
 
@@ -216,7 +220,7 @@ logico_if: cond_2 { printf("\033[0;34mSintático logico_if sem else\033[0m\n");}
     | T_CONT_CONDICIONAL function_block { printf("\033[0;34mSintático logico_if com else\033[0m\n");}
     ;
 
-cond_2: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_block;
+cond_2: T_CONDICIONAL T_LEFT_PARENTHESES b_expr T_RIGHT_PARENTHESES function_block;
 
 
 
@@ -224,15 +228,15 @@ cond_2: T_CONDICIONAL T_LEFT_PARENTHESES condicao T_RIGHT_PARENTHESES function_b
 
 assign: 
 	  T_ID T_ASSIGN mixed_expr { printf("\033[0;34mSintático atribuição sem primitivo\033[0m\n");}
-    | T_ID T_ASSIGN condicao { printf("\033[0;34mSintático atribuição sem primitivo\033[0m\n") }
+    | T_ID T_ASSIGN b_expr { printf("\033[0;34mSintático atribuição sem primitivo\033[0m\n") }
     ;
 
 
 
-declaracao: T_PRIMITIVO T_ID T_ASSIGN mixed_expr {
+declaracao: primitive_type T_ID T_ASSIGN mixed_expr {
     printf("\033[0;34mSintático atribuição\033[0m\n");
     
-    defineVariable(std::to_string($2),T_INT);
+    defineVariable(std::to_string($2),$1);
 };
 
 
