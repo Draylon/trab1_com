@@ -51,16 +51,14 @@ ARQUIVO  [a-zA-Z0-9\/.-]+
 
     parse_print("Um valor inteiro",yytext);
     col += strlen(yytext);
-    return T_INT;
-    
-    
+    return INT;
 }
 
 {DIGITO}+"."{DIGITO}* {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Um valor real",yytext);
     col += strlen(yytext);
-    return T_REAL;
+    return FLOAT;
     
 }
 
@@ -71,11 +69,18 @@ const {
     return T_CONST;
 }
 
-void|char|short|int|long|float|double|signed|unsigned {
+void|char|short|long|float|double|signed|unsigned {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Tipo primitivo",yytext);
     col += strlen(yytext);
     return T_PRIMITIVO;
+}
+
+int {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Tipo primitivo INT",yytext);
+    col += strlen(yytext);
+    return T_INT;
 }
 
 "#include" {

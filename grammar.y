@@ -53,12 +53,13 @@ std::map<std::string, std::pair<int,type_enum> > symbTab;
 
 /* Declaração dos tokens... */
 
-%token<ival> T_INT
-%token<fval> T_REAL
+%token<ival> INT
+%token<fval> FLOAT
 %token <bval> BOOL
 %token <aopval> T_ARITH_OP
 %token <idval> T_ID
 
+%token T_INT
 %token T_DEFINE T_INCLUDE T_LIBRARY
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT
 %token T_NEWLINE T_QUIT
@@ -106,7 +107,6 @@ statement:
 	| when
 	| declaracao T_SEPARATOR
 	| comentario
-	| b_expr
 	| chamada_funcao
 	| incremento T_SEPARATOR
 	| loop_while
@@ -171,9 +171,7 @@ loop_while_cond: b_expr loop_while_cond | ;
 
 
 
-primitive_type: 
-	T_INT {$$ = T_INT; /* não sei pra que exatamente, mais peguei kkkkk */ }
-	;
+primitive_type: T_PRIMITIVO;
 
 
 
@@ -246,9 +244,9 @@ comentario: T_SLC {printf("\033[0;34mSintatico Comentário unica linha\033[0m\n"
 
 comm_ml: T_COMMENT_C comm_ml | ;
 
-mixed_expr: T_INT {
-        $$.sType = T_INT;
-        writeCode("ldc "+std::to_string($1));
+mixed_expr: INT {
+        $$.sType = E_INT; writeCode("ldc "+std::to_string($1));
+        std::cout << "reconhecido numero " << $$.sType << " - " << $1 << " - " << std::to_string($1) << std::endl;
     }
     | mixed_expr T_ARITH_OP mixed_expr {
         arithCast(std::string($2));
@@ -276,9 +274,9 @@ mixed_expr: T_INT {
 comentario: T_SLC T_NEWLINE {printf("Sintatico Comentário unica linha\n");}
     | T_MLC_START comm_ml T_MLC_END {printf("Sintatico Comentário multi-linhas\n");};
 
-comm_ml: T_INT comm_ml | T_REAL comm_ml | T_PLUS comm_ml | T_MINUS comm_ml | T_MULTIPLY comm_ml | T_DIVIDE comm_ml | T_LEFT comm_ml | T_RIGHT comm_ml | T_NEWLINE comm_ml | T_QUIT comm_ml | T_SWITCH comm_ml | T_LEFT_BLOCK comm_ml | T_LEFT_PARENTHESES comm_ml | T_RIGHT_BLOCK comm_ml | T_RIGHT_PARENTHESES comm_ml | T_ASSIGN comm_ml | T_CONDICIONAL comm_ml | T_ID comm_ml | T_RESERVED comm_ml | T_RETURN comm_ml | T_LOGIC_OPERATOR comm_ml | T_PRIMITIVO comm_ml | T_DEFINE comm_ml | T_SLC comm_ml | T_STRING comm_ml | T_INCLUDE comm_ml | T_LIBRARY comm_ml | T_LEFT_POINTER comm_ml | T_RIGHT_POINTER comm_ml | T_OP_SUM comm_ml | T_OP_SUB comm_ml | T_OP_MUL comm_ml | T_OP_DIV comm_ml | T_LOOP comm_ml | T_CONT_CONDICIONAL comm_ml | T_EMPTY comm_ml | T_TAB comm_ml | T_CARRIER comm_ml | T_UNKNOWN comm_ml | T_SEPARATOR comm_ml | T_PLUS comm_ml | T_MINUS comm_ml | T_MULTIPLY comm_ml | T_DIVIDE | ;
+comm_ml: INT comm_ml | FLOAT comm_ml | T_PLUS comm_ml | T_MINUS comm_ml | T_MULTIPLY comm_ml | T_DIVIDE comm_ml | T_LEFT comm_ml | T_RIGHT comm_ml | T_NEWLINE comm_ml | T_QUIT comm_ml | T_SWITCH comm_ml | T_LEFT_BLOCK comm_ml | T_LEFT_PARENTHESES comm_ml | T_RIGHT_BLOCK comm_ml | T_RIGHT_PARENTHESES comm_ml | T_ASSIGN comm_ml | T_CONDICIONAL comm_ml | T_ID comm_ml | T_RESERVED comm_ml | T_RETURN comm_ml | T_LOGIC_OPERATOR comm_ml | T_PRIMITIVO comm_ml | T_DEFINE comm_ml | T_SLC comm_ml | T_STRING comm_ml | T_INCLUDE comm_ml | T_LIBRARY comm_ml | T_LEFT_POINTER comm_ml | T_RIGHT_POINTER comm_ml | T_OP_SUM comm_ml | T_OP_SUB comm_ml | T_OP_MUL comm_ml | T_OP_DIV comm_ml | T_LOOP comm_ml | T_CONT_CONDICIONAL comm_ml | T_EMPTY comm_ml | T_TAB comm_ml | T_CARRIER comm_ml | T_UNKNOWN comm_ml | T_SEPARATOR comm_ml | T_PLUS comm_ml | T_MINUS comm_ml | T_MULTIPLY comm_ml | T_DIVIDE | ;
 
-expr: T_INT                                    { $$ = $1; }
+expr: INT                                    { $$ = $1; }
     | expr T_PLUS expr                        { $$ = $1 + $3; }
     | expr T_MINUS expr                        { $$ = $1 - $3; }
     | expr T_MULTIPLY expr                    { $$ = $1 * $3; }
