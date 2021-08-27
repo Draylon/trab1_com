@@ -38,13 +38,7 @@ std::map<std::string,std::string> inst_list = {
 };
 
 
-void declareVariable(std::string name, int varType) {
-	if (varToVarIndexAndType.count(name) == 1)
-		printf("VARIÁVEL JÁ DECLARADA!");
-	varToVarIndexAndType[name] = std::make_pair(currentVariableIndex++, static_cast<type_enum>(varType));
-}
-
-bool checkIfVariableExists(std::string varName) {
+bool varExists(std::string varName) {
 	return varToVarIndexAndType.count(varName);
 }
 
@@ -61,7 +55,9 @@ void backpatch(std::set<int> list, int instruction_index) {
 }
 
 void defineVariable(std::string name, int varType) {
-	declareVariable(name, varType);
+	if (varToVarIndexAndType.count(name) == 1)
+		throw std::logic_error("VARIÁVEL JÁ DECLARADA!");
+	varToVarIndexAndType[name] = std::make_pair(currentVariableIndex++, static_cast<type_enum>(varType));
 	if (varType == E_INT) {
 		appendToCode("iconst_0");
 		appendToCode("istore " + std::to_string(currentVariableIndex -1));
@@ -77,7 +73,6 @@ void writeCode(std::string x){
 }
 
 void createHeader(){
-	writeCode(".source " + outfileName);
 	writeCode(".class public test\n.super java/lang/Object\n"); //code for defining class
 	writeCode(".method public <init>()V");
 	writeCode("aload_0");
@@ -95,8 +90,7 @@ void createHeader(){
 	writeCode(".line 1");
 }
 
-void generateFooter()
-{
+void createFooter(){
 	writeCode("return");
 	writeCode(".end method");
 }

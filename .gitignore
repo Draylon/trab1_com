@@ -9,3 +9,5 @@ lex.yy.c
 *.svg
 *.output
 jasmin-1.1
+*.j
+*.class

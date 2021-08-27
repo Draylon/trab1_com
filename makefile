@@ -2,7 +2,7 @@
 all: bison flex gcc
 
 gcc:
-	g++ -std=c++11 grammar.tab.c lex.yy.c -lm -lfl -o binary
+	g++ -std=c++11 grammar.tab.c lex.yy.c -lm -o binary
 
 flex:
 	flex principal.lex
@@ -18,9 +18,10 @@ clean:
 	rm -rf *.o
 	rm -rf *.exe
 	rm -rf binary
+	rm -rf *.j
 
 run: clean all
-	./binary ./testes/arquivo.txt
+	./binary ./testes/caso_simples_batata.txt
 
 flex_run: clean flex
 	g++ lex.yy.c -lfl -lm -o binary
@@ -61,6 +62,9 @@ d_java_run:
 	javap.exe -c test.class
 	java.exe test
 
-exec_jasm: exec jasmine_temp run
+d_run:
+	java.exe test
 
-d_exec_jasm: exec d_jasmine_temp d_run
+exec_jasm: exec jasmine_temp java_run
+
+d_jsm: d_jasmine_temp d_run

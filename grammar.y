@@ -13,9 +13,8 @@
 
 #include "bytecode_inst.h"
 
-
-extern int yylex();
-extern int yyparse();
+extern int yylex(void);
+extern int yyparse(void);
 extern FILE* yyin;
 
 
@@ -95,7 +94,7 @@ std::map<std::string, std::pair<int,type_enum> > symbTab;
 
 %%
 
-start_: {createHeader();} start_2;
+start_: {createHeader();} start_2 {createFooter();};
 
 start_2: statement start_2
     | ;
@@ -114,6 +113,7 @@ statement:
 	| loop_for
 	| loop_do
     | print
+    | assign
     ;
 
 marker:{
@@ -129,14 +129,9 @@ goto:{
 
 print: T_PRINT T_LEFT_PARENTHESES mixed_expr T_RIGHT_PARENTHESES T_SEPARATOR
     {
-        /* expression is at top of stack now */
-        /* save it at the predefined temp syso var */            
         writeCode("istore " + std::to_string(symbTab["int_expr"].first));
-        /* call syso */            
         writeCode("getstatic      java/lang/System/out Ljava/io/PrintStream;");
-        /*insert param*/
         writeCode("iload " + std::to_string(symbTab["int_expr"].first ));
-        /*invoke syso*/
         writeCode("invokevirtual java/io/PrintStream/println(I)V");
     };
 
@@ -223,8 +218,12 @@ cond_2: T_CONDICIONAL T_LEFT_PARENTHESES b_expr T_RIGHT_PARENTHESES function_blo
 
 
 assign: 
-	  T_ID T_ASSIGN mixed_expr { printf("\033[0;34mSintático atribuição sem primitivo\033[0m\n");}
-    | T_ID T_ASSIGN b_expr { printf("\033[0;34mSintático atribuição sem primitivo\033[0m\n") }
+    T_ID T_ASSIGN mixed_expr {
+        printf("\033[0;34mSintático atribuição sem primitivo\033[0m\n");
+    }
+    | T_ID T_ASSIGN b_expr { 
+        printf("\033[0;34mSintático atribuição sem primitivo\033[0m\n");
+    }
     ;
 
 
@@ -307,8 +306,7 @@ char **argv;
 
 
 void printCode(void){
-	for ( int i = 0 ; i < codeList.size() ; i++)
-	{
+	for ( int i = 0 ; i < codeList.size() ; i++){
 		fout<<codeList[i]<<std::endl;
 	}
 }
@@ -319,11 +317,11 @@ void yyerror(const char* s) {
 }
 
 
-int main (int argv, char * argc[]){
-    ++argc, --argv;
+int main (int argc, char * argv[]){
+    --argc, ++argv;
     if ( argv > 0 ){
-        yyin = fopen( argc[0], "r" );
-        outfileName = std::string(argc[1]);
+        yyin = fopen( argv[0], "r" );
+        outfileName = std::string(argv[0]);
     }else{
         yyin = stdin;
         outfileName = "input_code.txt";
@@ -335,4 +333,3 @@ int main (int argv, char * argc[]){
 
     return 0;
 }
-
