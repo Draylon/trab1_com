@@ -48,9 +48,9 @@ ARQUIVO  [a-zA-Z0-9\/.-]+
 
 {DIGITO}+ {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
-
     parse_print("Um valor inteiro",yytext);
     col += strlen(yytext);
+    yylval.ival = atoi(yytext);
     return INT;
 }
 
@@ -58,8 +58,8 @@ ARQUIVO  [a-zA-Z0-9\/.-]+
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Um valor real",yytext);
     col += strlen(yytext);
+    yylval.fval = atof(yytext);
     return FLOAT;
-    
 }
 
 const {
@@ -309,6 +309,7 @@ else {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Um identificador",yytext);
     col += strlen(yytext);
+    yylval.idval = strdup(yytext);
     return T_ID;
 }
 

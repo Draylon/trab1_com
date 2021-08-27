@@ -9,7 +9,7 @@
 std::string outfileName;
 std::vector<std::string> codeList;
 typedef enum {E_INT} type_enum;
-std::map <std::string, std::pair<int, type_enum>> varToVarIndexAndType;
+std::map<std::string, std::pair<int,type_enum> > lista_simbolos;
 int currentVariableIndex = 1;
 int nextInstructionIndex = 0;
 std::vector <std::string> outputCode;
@@ -39,7 +39,11 @@ std::map<std::string,std::string> inst_list = {
 
 
 bool varExists(std::string varName) {
-	return varToVarIndexAndType.count(varName);
+	return lista_simbolos.count(varName);
+}
+
+bool checkId(std::string op){
+    return (lista_simbolos.find(op) != lista_simbolos.end());
 }
 
 void appendToCode(std::string code) {
@@ -55,9 +59,9 @@ void backpatch(std::set<int> list, int instruction_index) {
 }
 
 void defineVariable(std::string name, int varType) {
-	if (varToVarIndexAndType.count(name) == 1)
+	if (lista_simbolos.count(name) == 1)
 		throw std::logic_error("VARIÁVEL JÁ DECLARADA!");
-	varToVarIndexAndType[name] = std::make_pair(currentVariableIndex++, static_cast<type_enum>(varType));
+	lista_simbolos[name] = std::make_pair(currentVariableIndex++, static_cast<type_enum>(varType));
 	if (varType == E_INT) {
 		appendToCode("iconst_0");
 		appendToCode("istore " + std::to_string(currentVariableIndex -1));
