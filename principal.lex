@@ -46,7 +46,7 @@ ARQUIVO  [a-zA-Z0-9\/.-]+
 
 %%
 
-{DIGITO}+ {
+-?{DIGITO}+ {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Um valor inteiro",yytext);
     col += strlen(yytext);
@@ -54,7 +54,7 @@ ARQUIVO  [a-zA-Z0-9\/.-]+
     return INT;
 }
 
-{DIGITO}+"."{DIGITO}* {
+-?{DIGITO}+"."{DIGITO}* {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Um valor real",yytext);
     col += strlen(yytext);
@@ -179,6 +179,7 @@ int {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Incremento",yytext);
     col += strlen(yytext);
+    if(!strcmp(yytext,"++")){ yylval.ival = 1;} else { yylval.ival = 0;}
     return T_INCREMENT;
 }
 
@@ -209,6 +210,7 @@ int {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Operação matematica",yytext);
     col += strlen(yytext);
+    yylval.idval = strdup(yytext);
     return T_ARITH_OP;
 }
 

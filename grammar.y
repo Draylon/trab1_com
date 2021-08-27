@@ -57,6 +57,7 @@ void yyerror(const char* s);
 %token <bval> BOOL
 %token <aopval> T_ARITH_OP
 %token <idval> T_ID
+%token <ival> T_INCREMENT
 
 %token T_INT
 %token T_DEFINE T_INCLUDE T_LIBRARY
@@ -70,7 +71,7 @@ void yyerror(const char* s);
 %token T_PRINT
 %token T_CONDICIONAL
 %left T_CONT_CONDICIONAL
-%token T_ASSIGN T_INCREMENT T_RETURN T_LOGIC_OPERATOR T_ARROW_RIGHT
+%token T_ASSIGN T_RETURN T_LOGIC_OPERATOR T_ARROW_RIGHT
 %token T_LEFT_POINTER T_RIGHT_POINTER
 %left T_OP_SUM T_OP_SUB T_OP_MUL T_OP_DIV
 %token T_MLC_START T_MLC_END T_EMPTY
@@ -112,7 +113,7 @@ statement:
     | loop_for
     | loop_do
     | print
-    | assign
+    | assign T_SEPARATOR
     ;
 
 marker:{
@@ -138,7 +139,7 @@ print: T_PRINT T_LEFT_PARENTHESES expression T_RIGHT_PARENTHESES T_SEPARATOR
 
 
 
-function_block: T_LEFT_BLOCK statement_set T_RIGHT_BLOCK | statement;
+function_block: T_LEFT_BLOCK marker statement_set T_RIGHT_BLOCK | statement;
 
 
 
@@ -176,7 +177,7 @@ primitive_type: T_INT { $$ = E_INT;};
 
 loop_for: T_FOR T_LEFT_PARENTHESES loop_for_cond T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático LOOP\033[0m\n");};
 
-loop_for_cond: loop_for_dec T_SEPARATOR loop_for_condicao T_SEPARATOR loop_for_inc;
+loop_for_cond: loop_for_dec T_SEPARATOR marker loop_for_condicao T_SEPARATOR marker loop_for_inc goto;
 loop_for_dec: declaracao | ;
 loop_for_condicao: b_expression;
 loop_for_inc: incremento | ;
@@ -233,9 +234,7 @@ assign:
 
 declaracao: primitive_type T_ID T_ASSIGN expression {
         printf("\033[0;34mSintático atribuição com valor\033[0m\n");
-        std::cout << "teste 1" << std::endl;
         std::string str($2);
-        std::cout << "teste 2" << std::endl;
         if($1 == E_INT){
             defineVariable(str,E_INT);
             writeCode("istore " + std::to_string(lista_simbolos[str].first));
@@ -251,7 +250,22 @@ declaracao: primitive_type T_ID T_ASSIGN expression {
 
 
 
-incremento: T_ID T_INCREMENT {printf("\033[0;34mIncremento\033[0m\n");};
+incremento: T_ID T_INCREMENT {
+    printf("\033[0;34mIncremento\033[0m\n");
+    std::string str($1);
+        if(checkId(str)){
+            if($2 == 1){
+                writeCode("iload " + std::to_string(lista_simbolos[str].first));
+                writeCode("ldc 1");
+                writeCode("iadd ");
+                writeCode("istore "+std::to_string(lista_simbolos[str].first));
+            }
+        }else{
+            std::string err = "identifier: "+str+" isn't declared in this scope";
+            yyerror(err.c_str());
+        }
+
+};
 
 
 
@@ -265,6 +279,7 @@ expression: INT {
         $$.sType = E_INT; writeCode("ldc "+std::to_string($1));
     }
     | expression T_ARITH_OP expression {
+        printf("\033[0;34mOperação matemática\033[0m\n");
         arithCast(std::string($2));
     }
     | T_LEFT expression T_RIGHT      { $$.sType = $2.sType; }

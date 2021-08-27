@@ -110,17 +110,13 @@ std::set<int> mergeLists(std::set<int> list1, std::set<int> list2) {
 	return list1;
 }
 
-std::string getOp(std::string op)
-{
+std::string getOp(std::string op){
 	if(inst_list.find(op) != inst_list.end())
-	{
 		return inst_list[op];
-	}
 	return "";
 }
 
-void arithCast(std::string op)
-{
+void arithCast(std::string op){
 	writeCode("i" + getOp(op));
 }
 

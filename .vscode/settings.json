@@ -48,7 +48,8 @@
         "xiosbase": "cpp",
         "xlocale": "cpp",
         "xlocinfo": "cpp",
-        "xlocnum": "cpp"
+        "xlocnum": "cpp",
+        "string_view": "c"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

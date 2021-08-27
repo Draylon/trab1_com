@@ -1,4 +1,6 @@
-int i = 2;
+int i = -2;
+i++;
 print(i);
-//i++;
+i = i + 5;
+print(i);
 //print(i);
