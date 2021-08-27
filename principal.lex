@@ -160,19 +160,34 @@ int {
     
 }
 
-"=="|"!="|"!=="|"<="|">="|"<"|">"|"and"|"or" {
+"=="|"!="|"!=="|"<="|">="|"<"|">" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Um sinal lógico",yytext);
     col += strlen(yytext);
+    yylval.idval = strdup(yytext);
     return T_LOGIC_OPERATOR;
-    
 }
 
-"="|"*="|"/="|"%="|"+="|"-="|"<<="|">>="|"&="|"^="|"|=" {
+"true"|"false" {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Um sinal lógico",yytext);
+    col += strlen(yytext);
+    if(!strcmp(yytext,"true")){yylval.bval = 1;} else { yylval.bval = 0;}
+    return BOOL;
+}
+
+"=" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Atribuição",yytext);
     col += strlen(yytext);
     return T_ASSIGN;
+}
+
+"*="|"/="|"%="|"+="|"-="|"<<="|">>="|"&="|"^="|"|=" {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Atribuição",yytext);
+    col += strlen(yytext);
+    return T_SELF_ASSIGN;
 }
 
 "++"|"--" {
@@ -212,6 +227,14 @@ int {
     col += strlen(yytext);
     yylval.idval = strdup(yytext);
     return T_ARITH_OP;
+}
+
+"and"|"or" {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Operação matematica",yytext);
+    col += strlen(yytext);
+    yylval.idval = strdup(yytext);
+    return T_BOOL_OP;
 }
 
 

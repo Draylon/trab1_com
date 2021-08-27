@@ -3,7 +3,6 @@
 
 #include <string>
 #include <map>
-#include <set>
 #include <vector>
 
 std::string outfileName;
@@ -26,6 +25,8 @@ std::map<std::string,std::string> inst_list = {
 	{"*", "mul"},
 	{"|", "or"},
 	{"&", "and"},
+	{"or", "or"},
+	{"and", "and"},
 	{"%", "rem"},
 
 	/* relational op */
@@ -51,11 +52,14 @@ void appendToCode(std::string code) {
 	nextInstructionIndex++;
 }
 
-void backpatch(std::set<int> list, int instruction_index) {
-	for (auto index : list) {
+void backpatch(std::vector<int> *list, int instruction_index) {
+	std::cout << "iterando em list" << std::endl;
+	for (auto it = list->begin(); it != list->end(); ++it) {
+		auto index = *it;
 		outputCode[index] = outputCode[index].substr(0, outputCode[index].size()-1);
 		outputCode[index] += "Label_" + std::to_string(instruction_index);
 	}
+	std::cout << "terminando em list" << std::endl;
 }
 
 void defineVariable(std::string name, int varType) {
@@ -99,14 +103,14 @@ void createFooter(){
 	writeCode(".end method");
 }
 
-std::set<int> makeList(int instruction_index) {
-	std::set<int> list{instruction_index};
+std::vector<int> makeList(int instruction_index) {
+	std::vector<int> list{instruction_index};
 	return list;
 }
 
-std::set<int> mergeLists(std::set<int> list1, std::set<int> list2) {
+std::vector<int>* merge(std::vector<int> *list1, std::vector<int> *list2) {
 	//As the call is by reference, list1 won't be changed and a its copy will be returned
-	list1.insert(list2.begin(), list2.end());
+	(*(list1)).insert((*(list1)).begin(),(*(list2)).begin(), (*(list2)).end());
 	return list1;
 }
 

@@ -4,3 +4,13 @@ print(i);
 i = i + 5;
 print(i);
 //print(i);
+
+if(1 == 2){
+    print(66);
+}
+
+if(1 == 2){
+    print(66);
+}else{
+    print(67);
+}

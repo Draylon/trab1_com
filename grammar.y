@@ -56,12 +56,15 @@ void yyerror(const char* s);
 %token<fval> FLOAT
 %token <bval> BOOL
 %token <aopval> T_ARITH_OP
+%token <aopval> T_BOOL_OP
+%token <aopval> T_LOGIC_OPERATOR
 %token <idval> T_ID
 %token <ival> T_INCREMENT
 
 %token T_INT
 %token T_DEFINE T_INCLUDE T_LIBRARY
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT
+%token T_SELF_ASSIGN
 %token T_NEWLINE T_QUIT
 %token T_PRIMITIVO T_RESERVED T_CONST
 %token T_SEPARATOR T_EXPR_SEPARATOR;
@@ -71,7 +74,7 @@ void yyerror(const char* s);
 %token T_PRINT
 %token T_CONDICIONAL
 %left T_CONT_CONDICIONAL
-%token T_ASSIGN T_RETURN T_LOGIC_OPERATOR T_ARROW_RIGHT
+%token T_ASSIGN T_RETURN T_ARROW_RIGHT
 %token T_LEFT_POINTER T_RIGHT_POINTER
 %left T_OP_SUM T_OP_SUB T_OP_MUL T_OP_DIV
 %token T_MLC_START T_MLC_END T_EMPTY
@@ -81,12 +84,22 @@ void yyerror(const char* s);
 %type <sType> primitive_type
 %type <expr_type> expression
 %type <bexpr_type> b_expression
+
 %type <stmt_type> logico_if
 %type <stmt_type> loop_while
 %type <stmt_type> loop_for
 %type <stmt_type> when
 %type <stmt_type> loop_do
 %type <stmt_type> print
+
+%type <stmt_type> statement
+%type <stmt_type> statement_set
+%type <stmt_type> function_block
+%type <stmt_type> declaracao
+%type <stmt_type> incremento
+%type <stmt_type> chamada_funcao
+%type <stmt_type> comentario
+%type <stmt_type> assign
 
 %type <ival> marker
 %type <ival> goto
@@ -100,20 +113,41 @@ start_: {createHeader();} start_2 {createFooter();};
 start_2: statement start_2
     | ;
 
-statement_set: statement | statement marker statement_set;
+statement_set: statement {
+    $$.nextList = $1.nextList;
+} | statement marker statement_set {
+    std::cout << "merging statements" << std::endl;
+    backpatch($1.nextList,$2);
+    $$.nextList = $3.nextList;
+    std::cout << "successful merge" << std::endl;
+};
 
 statement: 
-    logico_if
-    | when
-    | declaracao T_SEPARATOR
-    | comentario
-    | chamada_funcao
-    | incremento T_SEPARATOR
+    logico_if {
+        $$.nextList = $1.nextList;
+    }
+    | when{
+        $$.nextList = $1.nextList;
+    }
+    | declaracao T_SEPARATOR {
+        $$.nextList = $1.nextList;
+    }
+    | comentario {
+        $$.nextList = $1.nextList;
+    }
+    | chamada_funcao 
+    | incremento T_SEPARATOR {
+        $$.nextList = $1.nextList;
+    }
     | loop_while
     | loop_for
     | loop_do
-    | print
-    | assign T_SEPARATOR
+    | print {
+        $$.nextList = $1.nextList;
+    }
+    | assign T_SEPARATOR {
+        $$.nextList = $1.nextList;
+    }
     ;
 
 marker:{
@@ -139,7 +173,12 @@ print: T_PRINT T_LEFT_PARENTHESES expression T_RIGHT_PARENTHESES T_SEPARATOR
 
 
 
-function_block: T_LEFT_BLOCK marker statement_set T_RIGHT_BLOCK | statement;
+function_block: T_LEFT_BLOCK statement_set T_RIGHT_BLOCK{
+        $$.nextList = $2.nextList;
+    }
+    | statement T_SEPARATOR{
+        $$.nextList = $1.nextList;
+    };
 
 
 
@@ -193,26 +232,62 @@ loop_do:
 
 
 
-b_expression: 
-    expression T_LOGIC_OPERATOR expression { printf("\033[0;34mSintático condicional 1\033[0m\n");}
-  | b_expression T_LOGIC_OPERATOR b_expression { printf("\033[0;34mSintático condicional 1\033[0m\n");}
-  | T_ID T_LOGIC_OPERATOR expression { printf("\033[0;34mSintático condicional 2\033[0m\n");}
-  | expression T_LOGIC_OPERATOR T_ID { printf("\033[0;34mSintático condicional 3\033[0m\n");}
-  | T_ID T_LOGIC_OPERATOR T_ID { printf("\033[0;34mSintático condicional 4\033[0m\n");}
-  | T_LEFT_PARENTHESES b_expression T_RIGHT_PARENTHESES { printf("\033[0;34mSintático condicional 5\033[0m\n");};
+b_expression: BOOL {
+		if($1){
+			$$.trueList = new std::vector<int> ();
+			$$.trueList->push_back(codeList.size());
+			$$.falseList = new std::vector<int>();
+			writeCode("goto ");
+		}else{
+			$$.trueList = new std::vector<int> ();
+			$$.falseList= new std::vector<int>();
+			$$.falseList->push_back(codeList.size());
+			writeCode("goto ");
+		}
+	}
+    | b_expression T_BOOL_OP marker b_expression {
+		if(!strcmp($2, "and")) {
+			backpatch($1.trueList, $3);
+			$$.trueList = $4.trueList;
+			$$.falseList = merge($1.falseList,$4.falseList);
+		} else if (!strcmp($2,"or")){
+			backpatch($1.falseList,$3);
+			$$.trueList = merge($1.trueList, $4.trueList);
+			$$.falseList = $4.falseList;
+		}
+	}
+	| expression T_LOGIC_OPERATOR expression {
+		std::string op($2);
+		$$.trueList = new std::vector<int>();
+		$$.trueList ->push_back(codeList.size());
+		$$.falseList = new std::vector<int>();
+		$$.falseList->push_back(codeList.size()+1);
+		writeCode(getOp(op)+ " ");
+		writeCode("goto ");
+	}
+	;
 
 
 
 
 
 
-logico_if: cond_2 { printf("\033[0;34mSintático logico_if sem else\033[0m\n");}
-    | T_CONT_CONDICIONAL function_block { printf("\033[0;34mSintático logico_if com else\033[0m\n");}
+logico_if: T_CONDICIONAL T_LEFT_PARENTHESES b_expression T_RIGHT_PARENTHESES T_LEFT_BLOCK marker statement_set goto T_RIGHT_BLOCK {
+        printf("\033[0;34mSintático logico_if sem else\033[0m\n");
+        backpatch($3.trueList,$6);
+        $$.nextList = $7.nextList;
+        std::cout << "backpatch feito" <<std::endl;
+        $$.nextList->push_back($8);
+        std::cout << "nextlist_pushback" <<std::endl;
+    }
+    | T_CONDICIONAL T_LEFT_PARENTHESES b_expression T_RIGHT_PARENTHESES T_LEFT_BLOCK marker statement_set goto T_RIGHT_BLOCK T_CONT_CONDICIONAL T_LEFT_BLOCK marker statement_set T_RIGHT_BLOCK {
+        printf("\033[0;34mSintático logico_if com else\033[0m\n");
+        backpatch($3.trueList,$6);
+        backpatch($3.falseList,$12);
+        $$.nextList = merge($7.nextList, $13.nextList);
+        $$.nextList->push_back($8);
+    }
     ;
-
-cond_2: T_CONDICIONAL T_LEFT_PARENTHESES b_expression T_RIGHT_PARENTHESES function_block;
-
-
 
 
 
@@ -284,17 +359,17 @@ expression: INT {
     }
     | T_LEFT expression T_RIGHT      { $$.sType = $2.sType; }
     | T_ID {
-		std::string str($1);
-		if(checkId(str)){
-			$$.sType = lista_simbolos[str].second;
-			if(lista_simbolos[str].second == E_INT){
-				writeCode("iload " + std::to_string(lista_simbolos[str].first));
-			}
-		}else{
-			std::string err = "id: "+str+" fora do escopo";
-			yyerror(err.c_str());
-		}
-	}
+        std::string str($1);
+        if(checkId(str)){
+            $$.sType = lista_simbolos[str].second;
+            if(lista_simbolos[str].second == E_INT){
+                writeCode("iload " + std::to_string(lista_simbolos[str].first));
+            }
+        }else{
+            std::string err = "id: "+str+" fora do escopo";
+            yyerror(err.c_str());
+        }
+    }
     ;
 
 
