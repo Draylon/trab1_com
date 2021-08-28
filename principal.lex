@@ -304,7 +304,7 @@ for {
     return T_FOR;
 }
 
-when {
+when|"switch" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Seletor when",yytext);
     col += strlen(yytext);

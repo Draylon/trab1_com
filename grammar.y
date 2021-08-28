@@ -57,6 +57,14 @@ void yyerror(const char* s);
         int endMarker;
         std::vector<int> *nextList;
     } func_stmt_type;
+    
+    struct {
+        int initMarker;
+        int midMarker;
+        int endMarker;
+        std::vector<int> *trueList;
+        std::vector<int> *falseList;
+    } fcm_stmt_type;
 
     int sType;
 }
@@ -100,9 +108,13 @@ void yyerror(const char* s);
 %type <stmt_type> logico_if
 %type <ret_stmt_type> if_else
 %type <stmt_type> loop_while
-%type <stmt_type> loop_for
-%type <stmt_type> when
 %type <stmt_type> loop_do
+%type <stmt_type> loop_for
+%type <stmt_type> loop_for_dec
+%type <stmt_type> loop_for_inc
+%type <fcm_stmt_type> loop_for_cond
+%type <stmt_type> when
+%type <stmt_type> switch_statement
 %type <stmt_type> print
 
 %type <stmt_type> statement
@@ -241,43 +253,90 @@ funcao_args: | T_STRING | T_ID ;
 
 
 
-when: T_SWITCH T_LEFT_PARENTHESES expression T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK {
-    printf("\033[0;34mSintático When\033[0m\n");
+when: T_SWITCH {
+        printf("\033[0;34mSintático When\033[0m\n");
+    } T_LEFT_PARENTHESES expression {
+        printf("\033[0;34mguardando expression\033[0m\n");
+        std::string str("when_temp");
+        if($4.sType == E_INT){
+            defineVariable(str,E_INT,1);
+            writeCode("istore " + std::to_string(lista_simbolos[str].first));
+        }else if($4.sType == E_STR){
+            defineVariable(str,E_STR,1);
+            writeCode("astore " + std::to_string(lista_simbolos[str].first));
+        }
+    } T_RIGHT_PARENTHESES T_LEFT_BLOCK marker switch_statement goto T_RIGHT_BLOCK {
+        backpatch($9.nextList,$10);
+        $$.nextList = $9.nextList;
+    };
+
+switch_statement: expression {
+        writeCode("aload "+std::to_string(lista_simbolos[std::string("when_temp")].first));
+        getOp(std::string("=="));
+    } T_ARROW_RIGHT function_block switch_statement {
+        $$.nextList = merge($4.nextList,$5.nextList);
+    }
+    | T_CONT_CONDICIONAL T_ARROW_RIGHT function_block switch_statement {
+        //ainda n sei
+    }
+    | {
+        writeCode("pop");
+    };
+
+
+
+//             1         2            3                4         5                      6                7         8
+//          marker  WHILE_WORD LEFT_BRACKET       b_expression RIGHT_BRACKET       LEFT_BRACKET_CURLY  marker statement_list RIGHT_BRACKET_CURLY
+loop_while: T_WHILE marker     T_LEFT_PARENTHESES b_expression T_RIGHT_PARENTHESES function_block{
+    printf("\033[0;34mSintático While\033[0m\n");
+    writeCode("goto " + getLabel($2));
+    backpatch($6.nextList,$2);
+    backpatch($4.trueList,$6.initMarker);
+    $$.nextList = $4.falseList;
+    deleteCode(1);
+    //$$.nextList->push_back($6.endMarker);
 };
-
-switch_statement: T_ID T_ARROW_RIGHT function_block switch_statement
-    | expression T_ARROW_RIGHT function_block switch_statement
-    | T_CONT_CONDICIONAL T_ARROW_RIGHT function_block switch_statement
-    | ;
-
-
-
-
-
-loop_while: T_WHILE T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático LOOP\033[0m\n");};
-
-loop_while_cond: b_expression loop_while_cond | ;
 
 
 
 primitive_type: T_INT { $$ = E_INT;};
 
+//          1          2                3             4                   5             6         7        8        9     10             11              12       13          14    15
+//        FOR_WORD LEFT_BRACKET       assignment    marker              b_expression SEMI_COLON marker assignment goto RIGHT_BRACKET LEFT_BRACKET_CURLY marker statement_list goto RIGHT_BRACKET_CURLY
+loop_for: T_FOR    T_LEFT_PARENTHESES loop_for_cond T_RIGHT_PARENTHESES function_block {
+    printf("\033[0;34mSintático For\033[0m\n");
+    backpatch($3.trueList,$5.initMarker);
+    std::vector<int> * v = new std::vector<int> ();
+    v->push_back($3.endMarker);
+    backpatch(v,$3.initMarker);
+    v = new std::vector<int>();
+    v->push_back($5.endMarker);
+    backpatch(v,$3.midMarker);
+    backpatch($5.nextList,$3.midMarker);
+    $$.nextList = $3.falseList;
+    };
 
 
-loop_for: T_FOR T_LEFT_PARENTHESES loop_for_cond T_RIGHT_PARENTHESES function_block { printf("\033[0;34mSintático LOOP\033[0m\n");};
+loop_for_cond: loop_for_dec T_SEPARATOR marker b_expression T_SEPARATOR marker loop_for_inc goto {
+    $$.trueList = $4.trueList;
+    $$.falseList = $4.falseList;
+    $$.initMarker = $3;
+    $$.midMarker = $6;
+    $$.endMarker = $8;
+};
+loop_for_dec: declaracao { $$.nextList = $1.nextList; } | {std::vector<int> * v = new std::vector<int> ();$$.nextList = v;};
+loop_for_inc: incremento { $$.nextList = $1.nextList; } | {std::vector<int> * v = new std::vector<int> ();$$.nextList = v;};
 
-loop_for_cond: loop_for_dec T_SEPARATOR marker loop_for_condicao T_SEPARATOR marker loop_for_inc goto;
-loop_for_dec: declaracao | ;
-loop_for_condicao: b_expression;
-loop_for_inc: incremento | ;
 
 
-
-
-loop_do: 
-    T_DO function_block T_WHILE 
-    T_LEFT_PARENTHESES loop_while_cond T_RIGHT_PARENTHESES T_SEPARATOR {
-        printf("\033[0;34mSintático condicional 1\033[0m\n");
+        // 1        2            4            5         6              7                8             9
+loop_do: T_DO function_block{
+        deleteCode(0);      } T_WHILE T_LEFT_PARENTHESES marker b_expression T_RIGHT_PARENTHESES T_SEPARATOR {
+        printf("\033[0;34mSintático Do while\033[0m\n");
+        backpatch($2.nextList,$6);
+        backpatch($7.trueList,$2.initMarker);
+        $$.nextList = $7.falseList;
+        //writeCode("goto " + getLabel($6));
     };
 
 
@@ -327,7 +386,7 @@ b_expression: BOOL {
 
 //              1                 2              3              4                5          6          7        8
 //                                                                           T_LEFT_BLOCK marker statement_set goto T_RIGHT_BLOCK
-logico_if: T_CONDICIONAL T_LEFT_PARENTHESES b_expression T_RIGHT_PARENTHESES function_block if_else{
+logico_if: T_CONDICIONAL T_LEFT_PARENTHESES b_expression T_RIGHT_PARENTHESES function_block if_else {
         if($6.returnMarker == labelsCount-1)
             printf("\033[0;34mSintático logico_if sem else\033[0m\n");
         backpatch($3.trueList,$5.initMarker);
@@ -388,12 +447,14 @@ incremento: T_ID T_INCREMENT {
     printf("\033[0;34mIncremento\033[0m\n");
     std::string str($1);
         if(checkId(str)){
+            writeCode("iload " + std::to_string(lista_simbolos[str].first));
+            writeCode("ldc 1");
             if($2 == 1){
-                writeCode("iload " + std::to_string(lista_simbolos[str].first));
-                writeCode("ldc 1");
-                writeCode("iadd ");
-                writeCode("istore "+std::to_string(lista_simbolos[str].first));
+                writeCode("iadd");
+            }else if($2 == 0){
+                writeCode("isub");
             }
+            writeCode("istore "+std::to_string(lista_simbolos[str].first));
         }else{
             std::string err = "identifier: "+str+" isn't declared in this scope";
             yyerror(err.c_str());

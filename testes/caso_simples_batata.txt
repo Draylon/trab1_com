@@ -1,4 +1,21 @@
-int i = 105;
+int i = 0;
+do{
+    print("crab rave "+i);
+    i++;
+}while(i < 2);
+
+
+for(;i > 0;){
+    print("for funcionando");
+    i--;
+}
+
+while(i <= 5){
+    print("while funcionando "+i);
+    i++;
+}
+
+i = 0;
 
 i = i + 6;
 
@@ -22,17 +39,17 @@ if(1==2){
     print("yikes");
 }
 
-print("Continuando a usaar o code");
+print("Continuando a usar o code");
 
 if(1==1) print("Print do if sem bloco");
 
-print("Continuando a usaar o code");
+print("Continuando a usar o code");
 
 if(1==2) print("Print do if sem bloco");
 
 if(1==1) print("Print do if sem bloco com valor de i = "+i);
 
-print("Continuando a usaar o code");
+print("Continuando a usar o code");
 
 if(1==1)
     if(2==2){

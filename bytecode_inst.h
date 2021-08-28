@@ -71,6 +71,10 @@ void popCode(int x){
     }
 }
 
+void deleteCode(int x){
+    codeList.erase(codeList.end()-1-x);
+}
+
 void appendCode(int back,std::string x){
     codeList.insert( codeList.begin()+(codeList.size()-back), x );
 }
@@ -96,9 +100,11 @@ void defineVariable(std::string name, int varType,int autoStore) {
 std::string genLabel(){
     return "L_"+std::to_string(labelsCount++);
 }
-
-std::string lastLabel(){
-    return "Llllllllllll_"+std::to_string(labelsCount);
+std::string getLabel(int x){
+    return "L_"+std::to_string(x);
+}
+std::string getLabel(){
+    return "L_"+std::to_string(labelsCount);
 }
 
 void createHeader(){
