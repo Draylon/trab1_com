@@ -1,6 +1,9 @@
-int i = 5;
+int i = 105;
 i = i + 6;
 print(i);
-/*print("pepegaa");
-print("pepega"+66);
-print("pepega"+i);*/
+print("");
+print("asd");
+print("asd"+"qwe");
+print(i+" = i = "+i);
+print("crab rave = "+999);
+print("pepega " + "stonks " + "lmao");

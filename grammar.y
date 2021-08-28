@@ -60,7 +60,7 @@ void yyerror(const char* s);
 %token<ival> INT
 %token<fval> FLOAT
 %token <bval> BOOL
-%token <aopval> T_ARITH_OP
+%left <aopval> T_ARITH_OP
 %token <aopval> T_BOOL_OP
 %token <aopval> T_LOGIC_OPERATOR
 %token <idval> T_ID
@@ -329,7 +329,7 @@ if_else: {
 
 assign: 
     T_ID T_ASSIGN expression {
-        printf("\033[0;34mSintático atribuição sem primitivo\033[0m\n");
+        printf("\033[0;34mSintático atribuição\033[0m\n");
         std::string str($1);
         if(checkId(str)){
             if($3.sType == E_INT){
@@ -347,7 +347,7 @@ declaracao: primitive_type T_ID T_ASSIGN expression {
         printf("\033[0;34mSintático atribuição com valor\033[0m\n");
         std::string str($2);
         if($1 == E_INT){
-            defineVariable(str,E_INT);
+            defineVariable(str,E_INT,1);
             writeCode("istore " + std::to_string(lista_simbolos[str].first));
         }
     }
@@ -355,7 +355,7 @@ declaracao: primitive_type T_ID T_ASSIGN expression {
         printf("\033[0;34mSintático atribuição\033[0m\n");
         std::string str($2);
         if($1 == E_INT){
-            defineVariable(str,E_INT);
+            defineVariable(str,E_INT,0);
         }
     };
 
@@ -391,17 +391,10 @@ expression: INT {
         writeCode("ldc "+std::to_string($1));
     }
     | T_STRING {
-        std::string str($1);
         $$.sType = E_STR;
+        std::string str($1);
         writeCode("ldc "+str);
     }
-    | expression T_ARITH_OP expression {
-        if($1.sType == E_INT && $3.sType == E_INT){
-            printf("\033[0;34mOperação matemática\033[0m\n");
-            arithCast(std::string($2));
-        }
-    }
-    | T_LEFT expression T_RIGHT      { $$.sType = $2.sType; }
     | T_ID {
         std::string str($1);
         if(checkId(str)){
@@ -413,6 +406,18 @@ expression: INT {
             std::string err = "id: "+str+" fora do escopo";
             yyerror(err.c_str());
         }
+    }
+    | expression T_ARITH_OP expression {
+        if($1.sType == E_INT && $3.sType == E_INT){
+            $$.sType = E_INT;
+            arithCast(std::string($2));
+        }else{
+            $$.sType = E_CONCAT;
+            call_converter($1.sType,$3.sType);
+        }
+    }
+    | T_LEFT expression T_RIGHT {
+        $$.sType = $2.sType;
     }
     ;
 

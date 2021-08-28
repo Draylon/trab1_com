@@ -39,7 +39,7 @@ void parse_print(const char* title,const char* yytext){
 DIGITO   [0-9]
 ID       [A-Za-z_][_A-Za-z0-9]*
 HEX      [a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9]
-TEXTO    [A-Za-z0-9][A-Za-z0-9]*
+TEXTO    [A-Za-z0-9!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?][A-Za-z0-9!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?]*
 ARQUIVO  [a-zA-Z0-9\/.-]+
 
 
@@ -105,7 +105,8 @@ int {
     return T_LIBRARY;
 }
 
-"\""({TEXTO}|.)*"\"" {
+
+"\""({TEXTO}|\ )*"\"" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("String",yytext);
     col += strlen(yytext);
