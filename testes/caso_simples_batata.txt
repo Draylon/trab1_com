@@ -1,7 +1,7 @@
 int i = 105;
+
 i = i + 6;
-/*
-*/
+
 print(i);
 print("");
 print("asd");
@@ -9,5 +9,32 @@ print("asd"+"qwe");
 print(i+" = i = "+i);
 print("crab rave = "+999);
 print("pepega " + "stonks " + "lmao");
-/*
-*/
+
+if(1==1){
+    print("Print do IF com bloco");
+}else{
+    print("yikes");
+}
+
+if(1==2){
+    print("Print do IF com bloco");
+}else{
+    print("yikes");
+}
+
+print("Continuando a usaar o code");
+
+if(1==1) print("Print do if sem bloco");
+
+print("Continuando a usaar o code");
+
+if(1==2) print("Print do if sem bloco");
+
+if(1==1) print("Print do if sem bloco com valor de i = "+i);
+
+print("Continuando a usaar o code");
+
+if(1==1)
+    if(2==2){
+        print("if stackado");
+    }
