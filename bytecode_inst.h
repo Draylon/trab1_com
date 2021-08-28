@@ -7,11 +7,11 @@
 
 std::string outfileName;
 std::vector<std::string> codeList;
-typedef enum {E_INT} type_enum;
+typedef enum {E_INT,E_STR} type_enum;
 std::map<std::string, std::pair<int,type_enum> > lista_simbolos;
 int currentVariableIndex = 1;
 int nextInstructionIndex = 0;
-std::vector <std::string> outputCode;
+//std::vector <std::string> codeList;
 int variablesNum = 1;
 int labelsCount = 0;
 
@@ -48,27 +48,38 @@ bool checkId(std::string op){
 }
 
 void appendToCode(std::string code) {
-	outputCode.push_back("Label_" + std::to_string(nextInstructionIndex) + ":\n" + code);
+	codeList.push_back("L_" + std::to_string(nextInstructionIndex) + ":\n" + code);
 	nextInstructionIndex++;
 }
 
 void backpatch(std::vector<int> *list, int instruction_index) {
-	std::cout << "iterando em list" << std::endl;
-	for (auto it = list->begin(); it != list->end(); ++it) {
-		auto index = *it;
-		outputCode[index] = outputCode[index].substr(0, outputCode[index].size()-1);
-		outputCode[index] += "Label_" + std::to_string(instruction_index);
-	}
-	std::cout << "terminando em list" << std::endl;
+	if(list->size() > 0)
+		for (auto it = list->begin(); it != list->end(); ++it) {
+			auto index = *it;
+			codeList[index] = codeList[index].substr(0, codeList[index].size()-1);
+			codeList[index] += " L_" + std::to_string(instruction_index);
+		}
 }
 
-void defineVariable(std::string name, int varType) {
+void writeCode(std::string x){
+	codeList.push_back(x);
+}
+
+void popCode(int x){
+	for(int i=0;i < x;i++){
+		codeList.pop_back();
+	}
+}
+
+void defineVariable(std::string name, int varType,int autoStore) {
 	if (lista_simbolos.count(name) == 1)
 		throw std::logic_error("VARIÁVEL JÁ DECLARADA!");
 	lista_simbolos[name] = std::make_pair(currentVariableIndex++, static_cast<type_enum>(varType));
 	if (varType == E_INT) {
-		appendToCode("iconst_0");
-		appendToCode("istore " + std::to_string(currentVariableIndex -1));
+		if(autoStore == 0){
+			writeCode("iconst_0");
+			writeCode("istore " + std::to_string(currentVariableIndex -1));
+		}
 	}
 }
 
@@ -76,12 +87,13 @@ std::string genLabel(){
 	return "L_"+std::to_string(labelsCount++);
 }
 
-void writeCode(std::string x){
-	codeList.push_back(x);
+std::string lastLabel(){
+	return "Ll_"+std::to_string(labelsCount);
 }
 
 void createHeader(){
 	writeCode(".class public test\n.super java/lang/Object\n"); //code for defining class
+	writeCode(".field static private message Ljava/lang/String;");
 	writeCode(".method public <init>()V");
 	writeCode("aload_0");
 	writeCode("invokenonvirtual java/lang/Object/<init>()V");

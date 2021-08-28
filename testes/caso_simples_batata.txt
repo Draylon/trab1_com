@@ -1,16 +1,6 @@
-int i = -2;
-i++;
+int i = 5;
+i = i + 6;
 print(i);
-i = i + 5;
-print(i);
-//print(i);
-
-if(1 == 2){
-    print(66);
-}
-
-if(1 == 2){
-    print(66);
-}else{
-    print(67);
-}
+/*print("pepegaa");
+print("pepega"+66);
+print("pepega"+i);*/

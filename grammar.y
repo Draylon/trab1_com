@@ -46,6 +46,11 @@ void yyerror(const char* s);
     struct {
         std::vector<int> *nextList;
     } stmt_type;
+    
+    struct {
+        int returnMarker;
+        std::vector<int> *nextList;
+    } ret_stmt_type;
 
     int sType;
 }
@@ -59,6 +64,7 @@ void yyerror(const char* s);
 %token <aopval> T_BOOL_OP
 %token <aopval> T_LOGIC_OPERATOR
 %token <idval> T_ID
+%token <idval> T_STRING
 %token <ival> T_INCREMENT
 
 %token T_INT
@@ -72,13 +78,13 @@ void yyerror(const char* s);
 %token T_LEFT_PARENTHESES T_RIGHT_PARENTHESES
 %token T_SWITCH T_FOR T_WHILE T_DO
 %token T_PRINT
+%token T_CONT_CONDICIONAL
 %token T_CONDICIONAL
-%left T_CONT_CONDICIONAL
 %token T_ASSIGN T_RETURN T_ARROW_RIGHT
 %token T_LEFT_POINTER T_RIGHT_POINTER
 %left T_OP_SUM T_OP_SUB T_OP_MUL T_OP_DIV
 %token T_MLC_START T_MLC_END T_EMPTY
-%token T_STRING T_TAB T_CARRIER T_UNKNOWN
+%token T_TAB T_CARRIER T_UNKNOWN
 %token T_COMMENT_C T_SLC
 
 %type <sType> primitive_type
@@ -86,6 +92,7 @@ void yyerror(const char* s);
 %type <bexpr_type> b_expression
 
 %type <stmt_type> logico_if
+%type <ret_stmt_type> if_else
 %type <stmt_type> loop_while
 %type <stmt_type> loop_for
 %type <stmt_type> when
@@ -108,18 +115,20 @@ void yyerror(const char* s);
 
 %%
 
-start_: {createHeader();} start_2 {createFooter();};
-
-start_2: statement start_2
-    | ;
+start_: 
+    {createHeader();} 
+    statement_set
+	marker
+    {
+        backpatch($2.nextList,$3);
+        createFooter();
+    };
 
 statement_set: statement {
     $$.nextList = $1.nextList;
 } | statement marker statement_set {
-    std::cout << "merging statements" << std::endl;
     backpatch($1.nextList,$2);
     $$.nextList = $3.nextList;
-    std::cout << "successful merge" << std::endl;
 };
 
 statement: 
@@ -127,26 +136,32 @@ statement:
         $$.nextList = $1.nextList;
     }
     | when{
-        $$.nextList = $1.nextList;
+        std::vector<int> * v = new std::vector<int>();
+        $$.nextList =v;
     }
     | declaracao T_SEPARATOR {
-        $$.nextList = $1.nextList;
+        std::vector<int> * v = new std::vector<int>();
+        $$.nextList =v;
     }
     | comentario {
-        $$.nextList = $1.nextList;
+        std::vector<int> * v = new std::vector<int>();
+        $$.nextList =v;
     }
     | chamada_funcao 
     | incremento T_SEPARATOR {
-        $$.nextList = $1.nextList;
+        std::vector<int> * v = new std::vector<int>();
+        $$.nextList =v;
     }
     | loop_while
     | loop_for
     | loop_do
     | print {
-        $$.nextList = $1.nextList;
+        std::vector<int> * v = new std::vector<int>();
+        $$.nextList=v;
     }
     | assign T_SEPARATOR {
-        $$.nextList = $1.nextList;
+        std::vector<int> * v = new std::vector<int>();
+        $$.nextList =v;
     }
     ;
 
@@ -163,10 +178,22 @@ goto:{
 
 print: T_PRINT T_LEFT_PARENTHESES expression T_RIGHT_PARENTHESES T_SEPARATOR
     {
-        writeCode("istore " + std::to_string(lista_simbolos["int_expr"].first));
-        writeCode("getstatic      java/lang/System/out Ljava/io/PrintStream;");
-        writeCode("iload " + std::to_string(lista_simbolos["int_expr"].first ));
-        writeCode("invokevirtual java/io/PrintStream/println(I)V");
+        if($3.sType == E_INT){
+            writeCode("istore " + std::to_string(lista_simbolos["int_expr"].first));
+            writeCode("getstatic      java/lang/System/out Ljava/io/PrintStream;");
+            writeCode("iload " + std::to_string(lista_simbolos["int_expr"].first ));
+            writeCode("invokevirtual java/io/PrintStream/println(I)V");
+        }else if($3.sType == E_STR){
+            writeCode("putstatic      test/message Ljava/lang/String;");
+            writeCode("getstatic      java/lang/System/out Ljava/io/PrintStream;");
+            writeCode("getstatic      test/message Ljava/lang/String;");
+            writeCode("invokevirtual  java/io/PrintStream/println(Ljava/lang/String;)V");
+            
+            /*writeCode("aastore " + std::to_string(lista_simbolos["int_expr"].first));
+            writeCode("getstatic java/lang/System/out Ljava/io/PrintStream;");
+            writeCode("aaload " + std::to_string(lista_simbolos["int_expr"].first ));
+            writeCode("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");*/
+        }
     };
 
 
@@ -257,13 +284,18 @@ b_expression: BOOL {
 		}
 	}
 	| expression T_LOGIC_OPERATOR expression {
-		std::string op($2);
-		$$.trueList = new std::vector<int>();
-		$$.trueList ->push_back(codeList.size());
-		$$.falseList = new std::vector<int>();
-		$$.falseList->push_back(codeList.size()+1);
-		writeCode(getOp(op)+ " ");
-		writeCode("goto ");
+        if($1.sType == E_INT && $3.sType == E_INT){
+            std::string op($2);
+            $$.trueList = new std::vector<int>();
+            $$.trueList ->push_back(codeList.size());
+            $$.falseList = new std::vector<int>();
+            $$.falseList->push_back(codeList.size()+1);
+            writeCode(getOp(op)+ " ");
+            writeCode("goto ");
+        }else{
+            std::string err = "Tipo incorreto na expressao";
+            yyerror(err.c_str());
+        }
 	}
 	;
 
@@ -272,20 +304,24 @@ b_expression: BOOL {
 
 
 
-logico_if: T_CONDICIONAL T_LEFT_PARENTHESES b_expression T_RIGHT_PARENTHESES T_LEFT_BLOCK marker statement_set goto T_RIGHT_BLOCK {
-        printf("\033[0;34mSintático logico_if sem else\033[0m\n");
+logico_if: T_CONDICIONAL T_LEFT_PARENTHESES b_expression T_RIGHT_PARENTHESES T_LEFT_BLOCK marker statement_set goto T_RIGHT_BLOCK if_else{
+        if($10.returnMarker == labelsCount-1)
+            printf("\033[0;34mSintático logico_if sem else\033[0m\n");
         backpatch($3.trueList,$6);
-        $$.nextList = $7.nextList;
-        std::cout << "backpatch feito" <<std::endl;
+        backpatch($3.falseList,$10.returnMarker);
+        $$.nextList = merge($7.nextList, $10.nextList);
         $$.nextList->push_back($8);
-        std::cout << "nextlist_pushback" <<std::endl;
-    }
-    | T_CONDICIONAL T_LEFT_PARENTHESES b_expression T_RIGHT_PARENTHESES T_LEFT_BLOCK marker statement_set goto T_RIGHT_BLOCK T_CONT_CONDICIONAL T_LEFT_BLOCK marker statement_set T_RIGHT_BLOCK {
+        std::cout << "resultado bool:" << std::endl;
+    };
+if_else: {
+        $$.returnMarker = labelsCount;
+        std::vector<int> * v = new std::vector<int>();
+        $$.nextList =v;
+    } | T_CONT_CONDICIONAL T_LEFT_BLOCK marker statement_set T_RIGHT_BLOCK {
         printf("\033[0;34mSintático logico_if com else\033[0m\n");
-        backpatch($3.trueList,$6);
-        backpatch($3.falseList,$12);
-        $$.nextList = merge($7.nextList, $13.nextList);
-        $$.nextList->push_back($8);
+        $$.returnMarker = $3;
+        $$.nextList = $4.nextList;
+        //$$.nextList->push_back($8);
     }
     ;
 
@@ -351,11 +387,19 @@ comentario: T_SLC {printf("\033[0;34mSintatico Comentário unica linha\033[0m\n"
 comm_ml: T_COMMENT_C comm_ml | ;
 
 expression: INT {
-        $$.sType = E_INT; writeCode("ldc "+std::to_string($1));
+        $$.sType = E_INT;
+        writeCode("ldc "+std::to_string($1));
+    }
+    | T_STRING {
+        std::string str($1);
+        $$.sType = E_STR;
+        writeCode("ldc "+str);
     }
     | expression T_ARITH_OP expression {
-        printf("\033[0;34mOperação matemática\033[0m\n");
-        arithCast(std::string($2));
+        if($1.sType == E_INT && $3.sType == E_INT){
+            printf("\033[0;34mOperação matemática\033[0m\n");
+            arithCast(std::string($2));
+        }
     }
     | T_LEFT expression T_RIGHT      { $$.sType = $2.sType; }
     | T_ID {
