@@ -1,5 +1,7 @@
 int i = 105;
 i = i + 6;
+/*
+*/
 print(i);
 print("");
 print("asd");
@@ -7,3 +9,5 @@ print("asd"+"qwe");
 print(i+" = i = "+i);
 print("crab rave = "+999);
 print("pepega " + "stonks " + "lmao");
+/*
+*/

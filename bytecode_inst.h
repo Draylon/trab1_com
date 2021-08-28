@@ -165,7 +165,8 @@ void call_converter(int t1,int t2){
             appendCode(0,"invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
 
         appendCode(0,"invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
-        appendCode(0,"invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
+        writeCode("putstatic test/message Ljava/lang/String;");
+        //appendCode(0,"invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");
     }else{
         if(t1 == E_INT || t1 ==  E_STR){
             std::cout << "o t2 já é o concat, tem q colocar o t1 antes do append do t2" << std::endl;

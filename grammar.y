@@ -193,6 +193,10 @@ print: T_PRINT T_LEFT_PARENTHESES expression T_RIGHT_PARENTHESES T_SEPARATOR
             writeCode("getstatic java/lang/System/out Ljava/io/PrintStream;");
             writeCode("aaload " + std::to_string(lista_simbolos["int_expr"].first ));
             writeCode("invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V");*/
+        }else if($3.sType == E_CONCAT){
+            writeCode("getstatic      java/lang/System/out Ljava/io/PrintStream;");
+            writeCode("getstatic      test/message Ljava/lang/String;");
+            writeCode("invokevirtual  java/io/PrintStream/println(Ljava/lang/String;)V");
         }
     };
 
