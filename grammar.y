@@ -80,16 +80,16 @@ void yyerror(const char* s);
 %token<fval> FLOAT
 %token <bval> BOOL
 %left <aopval> T_ARITH_OP
-%token <aopval> T_BOOL_OP
-%token <aopval> T_LOGIC_OPERATOR
+%left <aopval> T_BOOL_OP
+%left <aopval> T_LOGIC_OPERATOR
 %token <idval> T_ID
 %token <idval> T_STRING
 %token <ival> T_INCREMENT
+%token <idval> T_SELF_ASSIGN
 
 %token T_INT
 %token T_DEFINE T_INCLUDE T_LIBRARY
 %token T_PLUS T_MINUS T_MULTIPLY T_DIVIDE T_LEFT T_RIGHT
-%token T_SELF_ASSIGN
 %token T_NEWLINE T_QUIT
 %token T_PRIMITIVO T_RESERVED T_CONST
 %token T_SEPARATOR T_EXPR_SEPARATOR;
@@ -97,8 +97,8 @@ void yyerror(const char* s);
 %token T_LEFT_PARENTHESES T_RIGHT_PARENTHESES
 %token T_SWITCH T_FOR T_WHILE T_DO
 %token T_PRINT
-%token T_CONT_CONDICIONAL
 %token T_CONDICIONAL
+%right T_CONT_CONDICIONAL
 %token T_ASSIGN T_RETURN T_ARROW_RIGHT
 %token T_LEFT_POINTER T_RIGHT_POINTER
 %left T_OP_SUM T_OP_SUB T_OP_MUL T_OP_DIV
@@ -356,8 +356,14 @@ loop_for_cond: loop_for_dec T_SEPARATOR marker b_expression T_SEPARATOR marker l
     $$.midMarker = $6;
     $$.endMarker = $8;
 };
-loop_for_dec: declaracao { $$.nextList = $1.nextList; } | {std::vector<int> * v = new std::vector<int> ();$$.nextList = v;};
-loop_for_inc: incremento { $$.nextList = $1.nextList; } | {std::vector<int> * v = new std::vector<int> ();$$.nextList = v;};
+loop_for_dec: 
+    declaracao { $$.nextList = $1.nextList; } 
+    | assign { $$.nextList = $1.nextList; }
+    | {std::vector<int> * v = new std::vector<int> ();$$.nextList = v;};
+loop_for_inc: 
+    incremento { $$.nextList = $1.nextList; }
+    | assign { $$.nextList = $1.nextList; }
+    | {std::vector<int> * v = new std::vector<int> ();$$.nextList = v;};
 
 
 
@@ -424,18 +430,18 @@ logico_if: T_CONDICIONAL T_LEFT_PARENTHESES b_expression T_RIGHT_PARENTHESES fun
         backpatch($3.trueList,$5.initMarker);
         backpatch($3.falseList,$6.returnMarker);
         $$.nextList = merge($5.nextList, $6.nextList);
-        int ii = $5.endMarker;
-        $$.nextList->push_back(ii);
+        $$.nextList->push_back($5.endMarker);
     };
-if_else: {
+if_else: T_CONT_CONDICIONAL function_block {
+        printf("\033[0;34mSintático logico_if com else\033[0m\n");
+        $$.returnMarker = $2.initMarker;
+        $$.nextList = $2.nextList;
+        popCode(1);
+        //$$.nextList->push_back($8);
+    } | {
         $$.returnMarker = labelsCount;
         std::vector<int> * v = new std::vector<int>();
         $$.nextList =v;
-    } | T_CONT_CONDICIONAL T_LEFT_BLOCK marker statement_set T_RIGHT_BLOCK {
-        printf("\033[0;34mSintático logico_if com else\033[0m\n");
-        $$.returnMarker = $3;
-        $$.nextList = $4.nextList;
-        //$$.nextList->push_back($8);
     }
     ;
 
@@ -476,8 +482,8 @@ declaracao: primitive_type T_ID T_ASSIGN expression {
 
 
 incremento: T_ID T_INCREMENT {
-    printf("\033[0;34mIncremento\033[0m\n");
-    std::string str($1);
+        printf("\033[0;34mIncremento\033[0m\n");
+        std::string str($1);
         if(checkId(str)){
             writeCode("iload " + std::to_string(lista_simbolos[str].first));
             writeCode("ldc 1");
@@ -491,8 +497,18 @@ incremento: T_ID T_INCREMENT {
             std::string err = "identifier: "+str+" isn't declared in this scope";
             yyerror(err.c_str());
         }
-
-};
+    } | T_ID T_SELF_ASSIGN expression {
+        printf("\033[0;34mIncremento em numero\033[0m\n");
+        std::string str($1);
+        if(checkId(str)){
+            writeCode("iload " + std::to_string(lista_simbolos[str].first));
+            arithCast(std::string($2));
+            writeCode("istore "+std::to_string(lista_simbolos[str].first));
+        }else{
+            std::string err = "identifier: "+str+" isn't declared in this scope";
+            yyerror(err.c_str());
+        }
+    };
 
 
 

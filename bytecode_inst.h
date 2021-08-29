@@ -29,6 +29,12 @@ std::map<std::string,std::string> inst_list = {
     {"and", "and"},
     {"%", "rem"},
 
+    /*self_increment*/
+    {"*=","mul"},
+    {"/=","div"},
+    {"+=","add"},
+    {"-=","sub"},
+
     /* relational op */
     {"==", "if_icmpeq"},
     {"<=", "if_icmple"},

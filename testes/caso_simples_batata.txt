@@ -1,13 +1,19 @@
-
 int i = 0;
+i+=5;
+print("valor de incremento "+i);
 do{
     print("crab rave "+i);
     i++;
 }while(i < 2);
 
 
+for(i=6;i < 10;){
+    print("for funcionando com "+i);
+    i++;
+}
+
 for(;i > 0;){
-    print("for funcionando");
+    print("for decrescendo "+i);
     i--;
 }
 
@@ -25,8 +31,8 @@ print("");
 print("asd");
 print("asd"+"qwe");
 print(i+" = i = "+i);
-print("crab rave = "+999);
-print("pepega " + "stonks " + "lmao");
+print("numero constante = "+999);
+print("texto " + "concatenado " + "nice");
 
 if(1==1){
     print("Print do IF com bloco");
@@ -37,7 +43,15 @@ if(1==1){
 if(1==2){
     print("Print do IF com bloco");
 }else{
-    print("yikes");
+    print("if falso");
+}
+
+for(i=0;i < 1;i++){
+    if(i==0){
+        print("Print do IF com bloco dentro do for");
+    }else{
+        print("if falso dentro do for");
+    }
 }
 
 print("Continuando a usar o code");

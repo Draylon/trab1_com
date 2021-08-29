@@ -189,6 +189,7 @@ int {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Atribuição",yytext);
     col += strlen(yytext);
+    yylval.idval = strdup(yytext);
     return T_SELF_ASSIGN;
 }
 

@@ -26,7 +26,7 @@ run: clean all
 flex_run: clean flex
 	g++ lex.yy.c -lfl -lm -o binary
 
-bison_run: clean
+bison_graph: clean
 	bison -d -g grammar.y
 
 #========
