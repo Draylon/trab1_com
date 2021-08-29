@@ -57,7 +57,10 @@ if(1==1)
         print("if stackado");
     }
 
-/*switch(5){
+
+i = 4;
+
+switch(i){
     4 -> {
         print(44);
     }
@@ -67,4 +70,30 @@ if(1==1)
     else -> {
         print(66);
     }
-}*/
+}
+i++;
+
+switch(i){
+    4 -> {
+        print(44);
+    }
+    5 -> {
+        print(55);
+    }
+    else -> {
+        print(66);
+    }
+}
+i = i + 20;
+
+switch(i){
+    4 -> {
+        print(44);
+    }
+    5 -> {
+        print(55);
+    }
+    else -> {
+        print(66);
+    }
+}

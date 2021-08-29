@@ -53,10 +53,9 @@ void yyerror(const char* s);
     } ret_stmt_type;
     
     struct {
-        int stacked;
-        int returnMarker;
+        int load_var;
         std::vector<int> *returnList;
-    } swt_stmt_type;
+    } swt_type;
     
     struct {
         int initMarker;
@@ -119,8 +118,9 @@ void yyerror(const char* s);
 %type <stmt_type> loop_for_dec
 %type <stmt_type> loop_for_inc
 %type <fcm_stmt_type> loop_for_cond
-%type <stmt_type> when
-%type <swt_stmt_type> switch_statement
+%type <swt_type> when
+%type <stmt_type> switch_statement
+%type <stmt_type> switch_statement_set
 %type <stmt_type> print
 
 %type <stmt_type> statement
@@ -134,6 +134,7 @@ void yyerror(const char* s);
 
 %type <ival> marker
 %type <ival> goto
+//%type <ival> codesize
 
 %start start_
 
@@ -193,6 +194,10 @@ marker:{
     $$ = labelsCount;
     writeCode(genLabel() + ":");
 };
+
+/* codesize: {
+    $$ = codeList.size()-1;
+}; */
 
 goto:{
     $$ = codeList.size();
@@ -259,19 +264,56 @@ funcao_args: | T_STRING | T_ID ;
 
 
 
-when: T_SWITCH T_LEFT_PARENTHESES expression T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK marker;
-
-switch_statement: expression T_ARROW_RIGHT function_block switch_statement {
-        $$.stacked = $4.stacked + 1;
-        //$$.nextList = merge($4.nextList,$5.nextList);
+when: {
+    if(!varExists(std::string("switch_temp"))){defineVariable(std::string("switch_temp"),E_INT,0);}
+    else{
+        writeCode("ldc 0");
+        writeCode("istore " + std::to_string(lista_simbolos[std::string("switch_temp")].first));
     }
-    | T_CONT_CONDICIONAL T_ARROW_RIGHT function_block switch_statement {
-        $$.stacked = $4.stacked + 1;
-        //$$.returnMarker
     }
-    | {
-        $$.stacked = 0;
+    T_SWITCH T_LEFT_PARENTHESES expression {
+        printf("\033[0;34mSintático When/Switch\033[0m\n");
+    } T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement_set T_RIGHT_BLOCK {
+        
     };
+
+switch_statement_set: switch_statement {
+    $$.nextList = $1.nextList;
+} | switch_statement marker switch_statement_set {
+    backpatch($1.nextList,$2);
+    $$.nextList = merge($1.nextList,$3.nextList);
+} | T_CONT_CONDICIONAL {
+        writeCode("pop");
+        writeCode("iload " + std::to_string(lista_simbolos[std::string("switch_temp")].first));
+        writeCode("ldc 0");
+        writeCode(getOp("==")+ " "+getLabel());
+        writeCode("goto "+getLabel(labelsCount+1));
+    } T_ARROW_RIGHT function_block {
+    //writeCode(getOp("==")+ " "+getLabel());
+    std::vector<int> * v = new std::vector<int> ();
+    $$.nextList = v;
+    $$.nextList->push_back($4.endMarker);
+    backpatch(v,labelsCount);
+    $$.nextList = merge($$.nextList,$4.nextList);
+};
+
+switch_statement: {
+        writeCode("dup");
+    }
+    expression {
+        writeCode(getOp("==")+ " "+getLabel());
+        writeCode("goto "+getLabel(labelsCount+2));
+    }marker T_ARROW_RIGHT {
+        writeCode("ldc 1");
+        writeCode("istore " + std::to_string(lista_simbolos[std::string("switch_temp")].first));
+    } function_block {
+        
+        std::vector<int> * v = new std::vector<int> ();
+        $$.nextList = v;
+        $$.nextList->push_back($7.endMarker);
+        $$.nextList = merge($$.nextList,$7.nextList);
+    };
+
 
 
 

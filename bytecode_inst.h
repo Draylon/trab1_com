@@ -79,6 +79,10 @@ void appendCode(int back,std::string x){
     codeList.insert( codeList.begin()+(codeList.size()-back), x );
 }
 
+void rewriteCode(int x){
+    codeList.push_back(codeList[x]);
+}
+
 void repositionCode(int back){
     std::string x = codeList.back();
     codeList.pop_back();
