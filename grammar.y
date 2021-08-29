@@ -53,6 +53,12 @@ void yyerror(const char* s);
     } ret_stmt_type;
     
     struct {
+        int stacked;
+        int returnMarker;
+        std::vector<int> *returnList;
+    } swt_stmt_type;
+    
+    struct {
         int initMarker;
         int endMarker;
         std::vector<int> *nextList;
@@ -114,7 +120,7 @@ void yyerror(const char* s);
 %type <stmt_type> loop_for_inc
 %type <fcm_stmt_type> loop_for_cond
 %type <stmt_type> when
-%type <stmt_type> switch_statement
+%type <swt_stmt_type> switch_statement
 %type <stmt_type> print
 
 %type <stmt_type> statement
@@ -253,34 +259,18 @@ funcao_args: | T_STRING | T_ID ;
 
 
 
-when: T_SWITCH {
-        printf("\033[0;34mSintático When\033[0m\n");
-    } T_LEFT_PARENTHESES expression {
-        printf("\033[0;34mguardando expression\033[0m\n");
-        std::string str("when_temp");
-        if($4.sType == E_INT){
-            defineVariable(str,E_INT,1);
-            writeCode("istore " + std::to_string(lista_simbolos[str].first));
-        }else if($4.sType == E_STR){
-            defineVariable(str,E_STR,1);
-            writeCode("astore " + std::to_string(lista_simbolos[str].first));
-        }
-    } T_RIGHT_PARENTHESES T_LEFT_BLOCK marker switch_statement goto T_RIGHT_BLOCK {
-        backpatch($9.nextList,$10);
-        $$.nextList = $9.nextList;
-    };
+when: T_SWITCH T_LEFT_PARENTHESES expression T_RIGHT_PARENTHESES T_LEFT_BLOCK switch_statement T_RIGHT_BLOCK marker;
 
-switch_statement: expression {
-        writeCode("aload "+std::to_string(lista_simbolos[std::string("when_temp")].first));
-        getOp(std::string("=="));
-    } T_ARROW_RIGHT function_block switch_statement {
-        $$.nextList = merge($4.nextList,$5.nextList);
+switch_statement: expression T_ARROW_RIGHT function_block switch_statement {
+        $$.stacked = $4.stacked + 1;
+        //$$.nextList = merge($4.nextList,$5.nextList);
     }
     | T_CONT_CONDICIONAL T_ARROW_RIGHT function_block switch_statement {
-        //ainda n sei
+        $$.stacked = $4.stacked + 1;
+        //$$.returnMarker
     }
     | {
-        writeCode("pop");
+        $$.stacked = 0;
     };
 
 
