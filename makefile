@@ -21,7 +21,7 @@ clean:
 	rm -rf *.j
 
 run: clean all
-	./binary ./testes/caso_simples_batata.txt
+	./binary ./testes/arquivo.txt
 
 flex_run: clean flex
 	g++ lex.yy.c -lfl -lm -o binary
@@ -45,14 +45,14 @@ error:
 
 custom_run: all
 	./binary tests/test6
-	java -jar ./jasmin-1.1/jasmin.jar output.j
+	java -jar ./jasmin.jar output.j
 	java test
 
 jasmine_temp:
-	java -jar ./jasmin-1.1/jasmin.jar output.j
+	java -jar ./jasmin.jar output.j
 
 d_jasmine_temp:
-	java.exe -jar ./jasmin-1.1/jasmin.jar output.j
+	java.exe -jar ./jasmin.jar output.j
 
 java_run:
 	java test
