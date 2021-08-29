@@ -1,72 +1,113 @@
-int x = 2;
-const int x = 2;
-x++;
-// https://kotlinlang.org/docs/control-flow.html#when-expression
+int i = 0;
+i+=5;
+print("valor de incremento "+i);
+do{
+    print("crab rave "+i);
+    i++;
+}while(i < 2);
 
-//print("Show");
 
-if((1 == 1) and (2 == 2)) print("yikes");
-
-if(1 == 1 and 2 == 2) print("yikes");
-
-if(1 == 1){
-    print("Show");
+for(i=6;i < 10;){
+    print("for funcionando com "+i);
+    i++;
 }
 
-if(1 == 1){
-    print("Show");
+for(;i > 0;){
+    print("for decrescendo "+i);
+    i--;
+}
+
+while(i <= 5){
+    print("while funcionando "+i);
+    i++;
+}
+
+i = 0;
+
+i = i + 6;
+
+print(i);
+print("");
+print("asd");
+print("asd"+"qwe");
+print(i+" = i = "+i);
+print("numero constante = "+999);
+print("texto " + "concatenado " + "nice");
+
+if(1==1){
+    print("Print do IF com bloco");
 }else{
-    if(show==true) show();
-    print("Show tbm");
+    print("yikes");
 }
 
-if(1 == 1) x++;
-
-for(int i=0;i < 10;i++){
-    print("omelgalul");
+if(1==2){
+    print("Print do IF com bloco");
+}else{
+    print("if falso");
 }
 
-for(i=0;i < 10;i++){
-    print("omelgalul");
-}
-
-for(;i < 10;i++){
-    print("omelgalul");
-}
-
-do{
-    print("show de bola");
-    x++;
-}while(x < 5);
-
-while(x < 5){
-    while(x < x){
-        //show
-    }
-    print("omegalul");
-}
-
-do{
-    print("show de bola");
-    x++;
-}while(x < 5);
-
-when (x) {
-    1 -> print("x == 1");
-    2 -> print("x == 2");
-    3 -> {
-        print();
-    }
-    else -> { // Note the block
-        print("x is neither 1 nor 2");
+for(i=0;i < 1;i++){
+    if(i==0){
+        print("Print do IF com bloco dentro do for");
+    }else{
+        print("if falso dentro do for");
     }
 }
 
-/*
-    if(x){
-        
-    }
-    comentário de multiplas
-    linhas
+print("Continuando a usar o code");
 
-*/
+if(1==1) print("Print do if sem bloco");
+
+print("Continuando a usar o code");
+
+if(1==2) print("Print do if sem bloco");
+
+if(1==1) print("Print do if sem bloco com valor de i = "+i);
+
+print("Continuando a usar o code");
+
+if(1==1)
+    if(2==2){
+        print("if stackado");
+    }
+
+
+i = 4;
+
+switch(i){
+    4 -> {
+        print(44);
+    }
+    5 -> {
+        print(55);
+    }
+    else -> {
+        print(66);
+    }
+}
+i++;
+
+switch(i){
+    4 -> {
+        print(44);
+    }
+    5 -> {
+        print(55);
+    }
+    else -> {
+        print(66);
+    }
+}
+i = i + 20;
+
+switch(i){
+    4 -> {
+        print(44);
+    }
+    5 -> {
+        print(55);
+    }
+    else -> {
+        print(66);
+    }
+}
