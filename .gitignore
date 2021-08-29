@@ -7,4 +7,7 @@ lex.yy.c
 !svg_gramatica/*
 !arquivos_dot/*
 *.svg
+*.output
 jasmin-1.1
+*.j
+*.class

@@ -2,7 +2,7 @@
 all: bison flex gcc
 
 gcc:
-	gcc grammar.tab.c lex.yy.c -lm -lfl -o binary
+	g++ -std=c++11 grammar.tab.c lex.yy.c -lm -o binary
 
 flex:
 	flex principal.lex
@@ -12,21 +12,21 @@ bison:
 
 clean:
 	rm -rf *.c
-	rm -rf *.h
 	rm -rf *.dot
 	rm -rf *.output
 	rm -rf *.tab.*
 	rm -rf *.o
 	rm -rf *.exe
 	rm -rf binary
+	rm -rf *.j
 
 run: clean all
 	./binary ./testes/arquivo.txt
 
 flex_run: clean flex
-	gcc lex.yy.c -lfl -lm -o binary
+	g++ lex.yy.c -lfl -lm -o binary
 
-bison_run: clean
+bison_graph: clean
 	bison -d -g grammar.y
 
 #========
@@ -34,7 +34,7 @@ bison_run: clean
 #========
 
 exec: all
-	./a.out
+	./binary
 
 java:
 	javac test.java
@@ -44,15 +44,15 @@ error:
 	bison --verbose syntax.y
 
 custom_run: all
-	./a.out tests/test6
-	java -jar ./jasmin-1.1/jasmin.jar output.j
+	./binary tests/test6
+	java -jar ./jasmin.jar output.j
 	java test
 
 jasmine_temp:
-	java -jar ./jasmin-1.1/jasmin.jar output.j
+	java -jar ./jasmin.jar output.j
 
 d_jasmine_temp:
-	java.exe -jar ./jasmin-1.1/jasmin.jar output.j
+	java.exe -jar ./jasmin.jar output.j
 
 java_run:
 	java test
@@ -62,6 +62,9 @@ d_java_run:
 	javap.exe -c test.class
 	java.exe test
 
-exec_jasm: exec jasmine_temp run
+d_run:
+	java.exe test
 
-d_exec_jasm: exec d_jasmine_temp d_run
+exec_jasm: exec jasmine_temp java_run
+
+d_jsm: d_jasmine_temp d_run

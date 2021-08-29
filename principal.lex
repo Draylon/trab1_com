@@ -30,7 +30,7 @@ void parse_print(const char* title,const char* yytext){
 }
 
 %}
-
+%option noyywrap
 /* ========================================================================== */
 /* ===========================  Sessão DEFINIÇÔES  ========================== */
 /* ========================================================================== */
@@ -39,29 +39,27 @@ void parse_print(const char* title,const char* yytext){
 DIGITO   [0-9]
 ID       [A-Za-z_][_A-Za-z0-9]*
 HEX      [a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9][a-f0-9]
-TEXTO    [A-Za-z0-9][A-Za-z0-9]*
+TEXTO    [A-Za-z0-9!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?][A-Za-z0-9!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?]*
 ARQUIVO  [a-zA-Z0-9\/.-]+
 
 
 
 %%
 
-{DIGITO}+ {
+-?{DIGITO}+ {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
-
     parse_print("Um valor inteiro",yytext);
     col += strlen(yytext);
-    return T_INT;
-    
-    
+    yylval.ival = atoi(yytext);
+    return INT;
 }
 
-{DIGITO}+"."{DIGITO}* {
+-?{DIGITO}+"."{DIGITO}* {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Um valor real",yytext);
     col += strlen(yytext);
-    return T_REAL;
-    
+    yylval.fval = atof(yytext);
+    return FLOAT;
 }
 
 const {
@@ -71,11 +69,18 @@ const {
     return T_CONST;
 }
 
-void|char|short|int|long|float|double|signed|unsigned {
+void|char|short|long|float|double|signed|unsigned {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Tipo primitivo",yytext);
     col += strlen(yytext);
     return T_PRIMITIVO;
+}
+
+int {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Tipo primitivo INT",yytext);
+    col += strlen(yytext);
+    return T_INT;
 }
 
 "#include" {
@@ -100,10 +105,12 @@ void|char|short|int|long|float|double|signed|unsigned {
     return T_LIBRARY;
 }
 
-"\""({TEXTO}|.)*"\"" {
+
+"\""({TEXTO}|\ )*"\"" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("String",yytext);
     col += strlen(yytext);
+    yylval.idval = strdup(yytext);
     return T_STRING;
 }
 
@@ -155,25 +162,42 @@ void|char|short|int|long|float|double|signed|unsigned {
     
 }
 
-"=="|"!="|"!=="|"<="|">="|"<"|">"|"and"|"or" {
+"=="|"!="|"!=="|"<="|">="|"<"|">" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Um sinal lógico",yytext);
     col += strlen(yytext);
+    yylval.idval = strdup(yytext);
     return T_LOGIC_OPERATOR;
-    
 }
 
-"="|"*="|"/="|"%="|"+="|"-="|"<<="|">>="|"&="|"^="|"|=" {
+"true"|"false" {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Um sinal lógico",yytext);
+    col += strlen(yytext);
+    if(!strcmp(yytext,"true")){yylval.bval = 1;} else { yylval.bval = 0;}
+    return BOOL;
+}
+
+"=" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Atribuição",yytext);
     col += strlen(yytext);
     return T_ASSIGN;
 }
 
+"*="|"/="|"%="|"+="|"-="|"<<="|">>="|"&="|"^="|"|=" {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Atribuição",yytext);
+    col += strlen(yytext);
+    yylval.idval = strdup(yytext);
+    return T_SELF_ASSIGN;
+}
+
 "++"|"--" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Incremento",yytext);
     col += strlen(yytext);
+    if(!strcmp(yytext,"++")){ yylval.ival = 1;} else { yylval.ival = 0;}
     return T_INCREMENT;
 }
 
@@ -200,33 +224,20 @@ void|char|short|int|long|float|double|signed|unsigned {
 
 
 
-"+" {
+"+"|"-"|"*"|"/" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
-    parse_print("Soma",yytext);
+    parse_print("Operação matematica",yytext);
     col += strlen(yytext);
-    return T_OP_SUM;
+    yylval.idval = strdup(yytext);
+    return T_ARITH_OP;
 }
 
-"-" {
+"and"|"or" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
-    parse_print("Subtracao",yytext);
+    parse_print("Operação matematica",yytext);
     col += strlen(yytext);
-    return T_OP_SUB;
-}
-
-"*" {
-    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
-    parse_print("Multiplicacao",yytext);
-    col += strlen(yytext);
-    return T_OP_MUL;
-    
-}
-
-"/" {
-    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
-    parse_print("Um operador",yytext);
-    col += strlen(yytext);
-    return T_OP_DIV;
+    yylval.idval = strdup(yytext);
+    return T_BOOL_OP;
 }
 
 
@@ -251,6 +262,13 @@ void|char|short|int|long|float|double|signed|unsigned {
     return T_MLC_END;
 }
 
+
+print {
+    if(check_comment(strlen(yytext))){return T_COMMENT_C;}
+    parse_print("Imprimir na tela",yytext);
+    col += strlen(yytext);
+    return T_PRINT;
+}
 
 print|setlocale {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
@@ -287,7 +305,7 @@ for {
     return T_FOR;
 }
 
-when {
+when|"switch" {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Seletor when",yytext);
     col += strlen(yytext);
@@ -319,6 +337,7 @@ else {
     if(check_comment(strlen(yytext))){return T_COMMENT_C;}
     parse_print("Um identificador",yytext);
     col += strlen(yytext);
+    yylval.idval = strdup(yytext);
     return T_ID;
 }
 
@@ -339,7 +358,7 @@ else {
     
     printf("Quebra de linha\n");
     row+=1;
-    return T_NEWLINE;
+    //return T_NEWLINE;
 }
 
 . {

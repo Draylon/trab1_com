@@ -1,0 +1,37 @@
+.class public test
+.super java/lang/Object
+
+.field static private message Ljava/lang/String;
+.method public <init>()V
+aload_0
+invokenonvirtual java/lang/Object/<init>()V
+return
+.end method
+
+.method public static main([Ljava/lang/String;)V
+.limit locals 100
+.limit stack 100
+.line 1
+L_0:
+
+getstatic java/lang/System/out Ljava/io/PrintStream;
+new java/lang/StringBuilder
+dup
+invokespecial java/lang/StringBuilder/<init>()V
+ldc "Your age is "
+invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+ldc 15
+invokevirtual java/lang/StringBuilder/append(I)Ljava/lang/StringBuilder;
+ldc " years old."
+invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;
+invokevirtual java/io/PrintStream/println(Ljava/lang/String;)V
+
+ldc "pepegaa"
+putstatic      test/message Ljava/lang/String;
+getstatic      java/lang/System/out Ljava/io/PrintStream;
+getstatic      test/message Ljava/lang/String;
+invokevirtual  java/io/PrintStream/println(Ljava/lang/String;)V
+L_1:
+return
+.end method
